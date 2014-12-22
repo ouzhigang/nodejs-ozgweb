@@ -1,6 +1,7 @@
 ﻿
 var http = require("http");
 var express = require("express");
+var session = require("cookie-session");
 var cfg = require("./cfg");
 var urls = require("./urls");
 
@@ -10,6 +11,10 @@ app.engine("html", (require("ejs")).renderFile);
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 app.use(express.static(__dirname + "/static"));
+
+app.use(session({
+	keys: ["ozgweb"]
+}));
 
 //url路由
 urls.startUrls(app);
@@ -23,5 +28,5 @@ app.on("close",
 (http.createServer(app)).listen(cfg.SERVER_PORT,
 	function() {
 		console.log("正在运行中...");
-	}	
+	}
 );
