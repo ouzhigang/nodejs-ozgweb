@@ -25,6 +25,7 @@ exports.res = function(res, res_code, desc, data) {
 	if(data)
 		res_data.data = data;
 	res.json(res_data);
+	res.end();
 };
 
 //回应请求成功
@@ -46,7 +47,7 @@ exports.resFail = function(res, res_code, desc, data) {
 //计算总页数
 exports.pageCount = function(count, page_size) {
 	if(count % page_size == 0)
-		return count / page_size;
+		return parseInt(count / page_size);
 	else
-		return (count / page_size) + 1;
+		return parseInt((count / page_size) + 1);
 };
