@@ -3,6 +3,9 @@ var cfg = require("../cfg");
 var commons = require("../commons");
 var models = require("../models");
 var os = require("os");
+var async = require("async");
+
+var tmpIndex = 0; //临时使用的索引
 
 exports.index = function(req, res) {
 	commons.renderTemplate(res, "admin/index.html");
@@ -345,10 +348,38 @@ exports.ajaxDataClassDel = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
-	else {
+	else {		
+		
 		commons.resFail(res, 1, "正在完成中");
+		
 	}
 };
+
+//ajaxDataList用到的递归获取data表的数据
+function data_list(data, total, page, page_size, page_count, res) {
+	
+	data[tmpIndex].getDataClass().on("success", 
+		function(dataclass) {
+			data[tmpIndex].dataValues.dataclass = dataclass;
+						
+			//最后一条数据
+			if(tmpIndex + 1 >= data.length) {									
+				var res_data = {
+					page: page,
+					page_size: page_size,
+					page_count: page_count,
+					total: total,
+					list: data
+				};
+				commons.resSuccess(res, "请求成功", res_data);
+				return;
+			}
+			
+			tmpIndex++;
+			data_list(data, total, page, page_size, page_count, res);
+		}
+	);	
+}
 
 exports.ajaxDataList = function(req, res) {
 	//需要登录才可以访问
@@ -363,25 +394,30 @@ exports.ajaxDataList = function(req, res) {
 		var page_size = cfg.PAGE_SIZE;
 		if(req.query.page_size)
 			page_size = parseInt(req.query.page_size);
-		
-		models.Data.count().on("success", 
-			function(total) {
 				
+		var type = 1;
+		if(req.query.type)
+			type = parseInt(req.query.type);
+		
+		models.Data.count({
+			where: {
+				type: type
+			}
+		}).on("success", 
+			function(total) {
 				var page_count = commons.pageCount(total, page_size);
 				var offset = parseInt((page - 1) * page_size);
 
 				models.Data.findAll({
+					where: {
+						type: type
+					},
 					limit: offset + ", " + page_size,
 					order: "id desc"
 				}).on("success", function(data) {
 					
-					var res_data = {
-						page: page,
-						page_size: page_size,
-						page_count: page_count,
-						list: data
-					};					
-					commons.resSuccess(res, "请求成功", res_data);
+					tmpIndex = 0;
+					data_list(data, total, page, page_size, page_count, res);
 					
 				}).on("failure", function(err) {		
 					commons.resFail(res, 1, err);
@@ -450,11 +486,9 @@ exports.ajaxDataAdd = function(req, res) {
 					{
 						name: name,
 						content: content,
-						add_time: parseInt((new Date()).getTime() / 1000),
 						dataclass_id: parseInt(request.body.dataclass_id),
 						sort: parseInt(request.body.sort),
 						type: parseInt(request.body.type),
-						hits: 0,
 						picture: ""
 					},
 					{

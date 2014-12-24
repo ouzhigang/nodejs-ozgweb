@@ -17,10 +17,10 @@ exports.startUrls = function(app) {
 	app.get("/admin/ajax_admin_update_pwd", admin.ajaxAdminUpdatePwd);
 	app.get("/admin/ajax_art_single_get", admin.ajaxArtSingleGet);
 	app.get("/admin/ajax_art_single_update", admin.ajaxArtSingleUpdate);
-	app.get("/admin/ajax_data_class_list", admin.ajaxDataClassList);
-	app.get("/admin/ajax_data_class_get", admin.ajaxDataClassGet);
-	app.get("/admin/ajax_data_class_add", admin.ajaxDataClassAdd);
-	app.get("/admin/ajax_data_class_del", admin.ajaxDataClassDel);
+	app.get("/admin/ajax_dataclass_list", admin.ajaxDataClassList);
+	app.get("/admin/ajax_dataclass_get", admin.ajaxDataClassGet);
+	app.get("/admin/ajax_dataclass_add", admin.ajaxDataClassAdd);
+	app.get("/admin/ajax_dataclass_del", admin.ajaxDataClassDel);
 	app.get("/admin/ajax_data_list", admin.ajaxDataList);
 	app.get("/admin/ajax_data_get", admin.ajaxDataGet);
 	app.get("/admin/ajax_data_add", admin.ajaxDataAdd);

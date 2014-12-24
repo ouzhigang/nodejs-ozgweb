@@ -1,5 +1,6 @@
 ﻿var Sequelize = require("sequelize");
 
+
 var sequelize = new Sequelize(
 	"ozgweb", 
 	null, 
@@ -9,6 +10,8 @@ var sequelize = new Sequelize(
 		storage: "./db.sys"
 	}
 );
+
+//定义部分
 
 exports.Admin = sequelize.define(
 	"Admin",
@@ -62,7 +65,15 @@ exports.Data = sequelize.define(
 		picture: Sequelize.STRING
 	},
 	{
-		tableName: "simple_dataclass",
+		tableName: "simple_data",
 		timestamps: false
 	}
 );
+
+//关联部分
+this.DataClass.hasMany(this.Data, {
+	foreignKey: "dataclass_id"
+});
+this.Data.belongsTo(this.DataClass, {
+	foreignKey: "dataclass_id"
+});
