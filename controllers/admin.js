@@ -3,7 +3,6 @@ var cfg = require("../cfg");
 var commons = require("../commons");
 var models = require("../models");
 var os = require("os");
-var async = require("async");
 
 var tmpIndex = 0; //临时使用的索引
 
