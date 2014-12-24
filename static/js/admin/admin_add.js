@@ -19,7 +19,7 @@ $(function() {
 			alert(msg);
 		else {
 			$.getJSON(
-				"ajax_admin_add?name=" + encodeURIComponent(name) + "&pwd=" + pwd + "&pwd2=" + pwd2 + "&random=" + Math.random(),
+				"ajax_admin_add?name=" + encodeURIComponent(name) + "&pwd=" + hex_md5(pwd) + "&pwd2=" + hex_md5(pwd2) + "&random=" + Math.random(),
 				function(data) {
 					$("#center-column").load("../../static/simple/admin_templates/admin_list.html?random=" + Math.random());
 				}
