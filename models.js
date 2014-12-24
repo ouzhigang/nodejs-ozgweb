@@ -1,6 +1,5 @@
 ﻿var Sequelize = require("sequelize");
 
-
 var sequelize = new Sequelize(
 	"ozgweb", 
 	null, 
