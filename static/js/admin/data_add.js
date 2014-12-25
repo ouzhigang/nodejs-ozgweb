@@ -70,7 +70,7 @@ $(function() {
 						$("#menu_param").val("type:" + get_menu_param("type") + ",page:" + page);
 					}
 					
-					$("#center-column").load("../../static/simple/admin_templates/data_list.html?random=" + Math.random());
+					$("#center-column").load("../../admin_templates/data_list.html?random=" + Math.random());
 				},
 				"json"
 			);

@@ -107,12 +107,18 @@ exports.ajaxAdminList = function(req, res) {
 					order: "id desc"
 				}).on("success", function(data) {
 					
+					for(var i in data) {						
+						var dt = new Date(parseInt(data[i].add_time) * 1000);						
+						data[i].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+					}
+					
 					var res_data = {
 						page: page,
 						page_size: page_size,
 						page_count: page_count,
+						total: total,
 						list: data
-					};					
+					};
 					commons.resSuccess(res, "请求成功", res_data);
 					
 				}).on("failure", function(err) {		
@@ -180,7 +186,9 @@ exports.ajaxAdminDel = function(req, res) {
 	else {		
 		var id = parseInt(req.query.id);
 		models.Admin.destroy({
-			id: id
+			where: {
+				id: id			
+			}
 		}).on("success", function(msg) {
 			commons.resSuccess(res, "删除成功");
 		}).on("failure", function(err) {
@@ -195,30 +203,44 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var old_pwd = request.query.old_pwd;
-		var pwd = request.query.pwd;
-		var pwd2 = request.query.pwd2;
+		var old_pwd = req.query.old_pwd;
+		var pwd = req.query.pwd;
+		var pwd2 = req.query.pwd2;
 		
-		if(old_pwd || old_pwd == "")
+		if(!req.query.old_pwd || old_pwd == "")
 			commons.resFail(res, 1, "旧密码不能为空");
-		if(pwd || pwd == "")
+		if(!req.query.pwd || pwd == "")
 			commons.resFail(res, 1, "新密码不能为空");
 		if(pwd != pwd2)
 			commons.resFail(res, 1, "确认密码不正确");
 		
-		models.Admin.update(
-			{
-				pwd: pwd
-			},
-			{
-				name: res.session.sess_admin.name,
+		models.Admin.count({
+			where: {
+				name: req.session.sess_admin.name,
 				pwd: old_pwd
 			}
-		).on("success", function(data) {
-			if(data)
-				commons.resSuccess(res, "修改密码成功");
-			else
+		}).on("success", function(total) {
+			
+			if(total == 0) {
 				commons.resFail(res, 1, "旧密码不正确");
+			}
+			else {
+				models.Admin.update(
+					{
+						pwd: pwd
+					},
+					{
+						where: {
+							name: req.session.sess_admin.name
+						}
+					}
+				).on("success", function(data) {
+					commons.resSuccess(res, "修改密码成功");				
+				}).on("failure", function(err) {
+					commons.resFail(res, 1, err);
+				});
+			}
+			
 		}).on("failure", function(err) {
 			commons.resFail(res, 1, err);
 		});
@@ -231,7 +253,7 @@ exports.ajaxArtSingleGet = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(request.query.id);
+		var id = parseInt(req.query.id);
 		
 		models.ArtSingle.find({
 			where: {
@@ -251,14 +273,18 @@ exports.ajaxArtSingleUpdate = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(request.body.id);
-		var content = request.body.content;
+		console.log(req.body);
+			
+		var id = parseInt(req.body.id);
+		var content = req.body.content;
 		models.ArtSingle.update(
 			{
 				content: content
 			},
 			{
-				id: id
+				where: {
+					id: id
+				}
 			}
 		).on("success", function(data) {
 			commons.resSuccess(res, "更新成功");
@@ -274,7 +300,24 @@ exports.ajaxDataClassList = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		commons.resFail(res, 1, "正在完成中");
+		
+		var type = 1;
+		if(req.query.type)
+			type = parseInt(req.query.type);
+		
+		models.DataClass.findAll({
+			where: {
+				type: type
+			},
+			order: "sort desc, id desc"
+		}).on("success", function(data) {
+
+			commons.resSuccess(res, "请求成功", data);
+					
+		}).on("failure", function(err) {
+			commons.resFail(res, 1, err);
+		});
+		
 	}
 };
 
@@ -283,7 +326,18 @@ exports.ajaxDataClassGet = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(request.query.id);
+		var id = parseInt(req.query.id);
+
+		models.DataClass.find({
+			where: {
+				id: id
+			}
+		}).on("success", function(data) {
+			commons.resSuccess(res, "请求成功", data);
+		}).on("failure", function(err) {
+			commons.resFail(res, 1, err);
+		});
+		
 		commons.resFail(res, 1, "正在完成中");
 	}
 };
@@ -294,11 +348,10 @@ exports.ajaxDataClassAdd = function(req, res) {
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		var id = 0;
-		if(request.query.id)
-			id = parseInt(request.query.id);
+		if(req.query.id)
+			id = parseInt(req.query.id);
 		
-		var name = request.query.name;
-		var parent_id = parseInt(request.query.parent_id);
+		var name = req.query.name;
 		
 		var dataclass = null;
 		
@@ -311,9 +364,8 @@ exports.ajaxDataClassAdd = function(req, res) {
 				models.DataClass.update(
 					{
 						name: name,
-						parent_id: parent_id,
-						sort: parseInt(request.query.sort),
-						type: parseInt(request.query.type)
+						sort: parseInt(req.query.sort),
+						type: parseInt(req.query.type)
 					},
 					{
 						id: id
@@ -330,9 +382,8 @@ exports.ajaxDataClassAdd = function(req, res) {
 			//添加
 			models.DataClass.create({
 				name: name,
-				parent_id: parent_id,
-				sort: parseInt(request.query.sort),
-				type: parseInt(request.query.type)
+				sort: parseInt(req.query.sort),
+				type: parseInt(req.query.type)
 			}).on("success", function(data) {
 				commons.resSuccess(res, "添加成功");
 			}).on("failure", function(err) {
@@ -347,10 +398,27 @@ exports.ajaxDataClassDel = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
-	else {		
+	else {
 		
-		commons.resFail(res, 1, "正在完成中");
+		var id = parseInt(req.query.id);		
 		
+		models.DataClass.destroy({
+			id: id
+		}).on("success", function(data) {
+			
+			//删除该分类下的数据
+			models.Data.destroy({
+				dataclass_id: id			
+			}).on("success", function(data) {
+				commons.resSuccess(res, "删除成功");
+			}).on("failure", function(err) {
+				commons.resFail(res, 1, err);
+			});
+			
+		}).on("failure", function(err) {
+			commons.resFail(res, 1, err);
+		});		
+				
 	}
 };
 
@@ -412,7 +480,7 @@ exports.ajaxDataList = function(req, res) {
 						type: type
 					},
 					limit: offset + ", " + page_size,
-					order: "id desc"
+					order: "sort desc, id desc"
 				}).on("success", function(data) {
 					
 					tmpIndex = 0;
@@ -435,7 +503,7 @@ exports.ajaxDataGet = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(request.query.id);
+		var id = parseInt(req.query.id);
 		models.Data.find({
 			where: {
 				id: id
@@ -456,22 +524,22 @@ exports.ajaxDataAdd = function(req, res) {
 	else {
 		
 		var id = 0;
-		if(request.body.id)
-			id = parseInt(request.body.id);
+		if(req.body.id)
+			id = parseInt(req.body.id);
 		
 		var name = null;
-		if(!request.body.name) {
+		if(!req.body.name) {
 			commons.resFail(res, 1, "名称不能为空");
 			return;
 		}			
-		name = request.body.name;
+		name = req.body.name;
 		
 		var content = null;
-		if(!request.body.content) {
+		if(!req.body.content) {
 			commons.resFail(res, 1, "内容不能为空");
 			return;
 		}			
-		content = request.body.content;
+		content = req.body.content;
 				
 		var data = null;
 		
@@ -485,9 +553,9 @@ exports.ajaxDataAdd = function(req, res) {
 					{
 						name: name,
 						content: content,
-						dataclass_id: parseInt(request.body.dataclass_id),
-						sort: parseInt(request.body.sort),
-						type: parseInt(request.body.type),
+						dataclass_id: parseInt(req.body.dataclass_id),
+						sort: parseInt(req.body.sort),
+						type: parseInt(req.body.type),
 						picture: ""
 					},
 					{
@@ -507,9 +575,9 @@ exports.ajaxDataAdd = function(req, res) {
 				name: name,
 				content: content,
 				add_time: parseInt((new Date()).getTime() / 1000),
-				dataclass_id: parseInt(request.body.dataclass_id),
-				sort: parseInt(request.body.sort),
-				type: parseInt(request.body.type),
+				dataclass_id: parseInt(req.body.dataclass_id),
+				sort: parseInt(req.body.sort),
+				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
 			}).on("success", function(data) {
@@ -527,7 +595,7 @@ exports.ajaxDataDel = function(req, res) {
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(request.query.id);
+		var id = parseInt(req.query.id);
 		models.Data.destroy({
 			id: id
 		}).on("success", function(data) {

@@ -2,6 +2,8 @@
 var http = require("http");
 var express = require("express");
 var session = require("cookie-session");
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var cfg = require("./cfg");
 var urls = require("./urls");
 
@@ -11,6 +13,9 @@ app.engine("html", (require("ejs")).renderFile);
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
 app.use(express.static(__dirname + "/static"));
+
+app.use(cookieParser());
+app.use(bodyParser());
 
 app.use(session({
 	keys: ["ozgweb"]

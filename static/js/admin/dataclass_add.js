@@ -50,7 +50,7 @@ $(function() {
 					else {
 						//重置参数
 						$("#menu_param").val("type:" + get_menu_param("type"));
-						$("#center-column").load("../../static/simple/admin_templates/dataclass_list.html?random=" + Math.random());
+						$("#center-column").load("../../admin_templates/dataclass_list.html?random=" + Math.random());
 					}
 						
 				}

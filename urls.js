@@ -13,17 +13,18 @@ exports.startUrls = function(app) {
 	app.get("/admin/ajax_logout", admin.ajaxLogout);
 	app.get("/admin/ajax_menu_list", admin.ajaxMenuList);
 	app.get("/admin/ajax_admin_list", admin.ajaxAdminList);
+	app.get("/admin/ajax_admin_add", admin.ajaxAdminAdd);
 	app.get("/admin/ajax_admin_del", admin.ajaxAdminDel);
-	app.get("/admin/ajax_admin_update_pwd", admin.ajaxAdminUpdatePwd);
+	app.get("/admin/ajax_admin_updatepwd", admin.ajaxAdminUpdatePwd);
 	app.get("/admin/ajax_art_single_get", admin.ajaxArtSingleGet);
-	app.get("/admin/ajax_art_single_update", admin.ajaxArtSingleUpdate);
+	app.post("/admin/ajax_art_single_update", admin.ajaxArtSingleUpdate);
 	app.get("/admin/ajax_dataclass_list", admin.ajaxDataClassList);
 	app.get("/admin/ajax_dataclass_get", admin.ajaxDataClassGet);
-	app.get("/admin/ajax_dataclass_add", admin.ajaxDataClassAdd);
+	app.post("/admin/ajax_dataclass_add", admin.ajaxDataClassAdd);
 	app.get("/admin/ajax_dataclass_del", admin.ajaxDataClassDel);
 	app.get("/admin/ajax_data_list", admin.ajaxDataList);
 	app.get("/admin/ajax_data_get", admin.ajaxDataGet);
-	app.get("/admin/ajax_data_add", admin.ajaxDataAdd);
+	app.post("/admin/ajax_data_add", admin.ajaxDataAdd);
 	app.get("/admin/ajax_data_del", admin.ajaxDataDel);
 	
 };
