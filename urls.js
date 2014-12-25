@@ -20,7 +20,7 @@ exports.startUrls = function(app) {
 	app.post("/admin/ajax_art_single_update", admin.ajaxArtSingleUpdate);
 	app.get("/admin/ajax_dataclass_list", admin.ajaxDataClassList);
 	app.get("/admin/ajax_dataclass_get", admin.ajaxDataClassGet);
-	app.post("/admin/ajax_dataclass_add", admin.ajaxDataClassAdd);
+	app.get("/admin/ajax_dataclass_add", admin.ajaxDataClassAdd);
 	app.get("/admin/ajax_dataclass_del", admin.ajaxDataClassDel);
 	app.get("/admin/ajax_data_list", admin.ajaxDataList);
 	app.get("/admin/ajax_data_get", admin.ajaxDataGet);

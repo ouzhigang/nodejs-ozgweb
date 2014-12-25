@@ -41,7 +41,6 @@ exports.DataClass = sequelize.define(
 	"DataClass",
 	{
 		name: Sequelize.STRING,
-		parent_id: Sequelize.INTEGER,
 		sort: Sequelize.INTEGER,
 		type: Sequelize.INTEGER
 	},

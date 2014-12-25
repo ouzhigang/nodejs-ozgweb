@@ -5,7 +5,7 @@ $(function() {
 	$.getJSON(
 		"ajax_dataclass_list?type=" + get_menu_param("type") + "&random=" + Math.random(),
 		function(data) {
-			show_data(data.data);
+			//show_data(data.data);
 			
 			if(get_menu_param("id")) {
 				//编辑状态
@@ -15,7 +15,7 @@ $(function() {
 						$("#title").html("修改分类");
 						
 						$("#name").val(data.data.name);
-						$("#dataclass").val(data.data.parent_id);
+						//$("#dataclass").val(data.data.parent_id);
 						$("#sort").val(data.data.sort);
 						
 						$("#btn_submit").val("更新");
@@ -37,9 +37,9 @@ $(function() {
 		else {
 			var url = null;
 			if(get_menu_param("id"))
-				url = "ajax_dataclass_add?id=" + get_menu_param("id") + "&name=" + encodeURIComponent($("#name").val()) + "&parent_id=" + $("#dataclass").val() + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
+				url = "ajax_dataclass_add?id=" + get_menu_param("id") + "&name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
 			else
-				url = "ajax_dataclass_add?name=" + encodeURIComponent($("#name").val()) + "&parent_id=" + $("#dataclass").val() + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
+				url = "ajax_dataclass_add?name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
 			
 			$.getJSON(
 				url,

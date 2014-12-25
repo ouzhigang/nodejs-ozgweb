@@ -338,7 +338,6 @@ exports.ajaxDataClassGet = function(req, res) {
 			commons.resFail(res, 1, err);
 		});
 		
-		commons.resFail(res, 1, "正在完成中");
 	}
 };
 
@@ -352,30 +351,26 @@ exports.ajaxDataClassAdd = function(req, res) {
 			id = parseInt(req.query.id);
 		
 		var name = req.query.name;
-		
-		var dataclass = null;
-		
+				
 		if(id != 0) {
 			//更新
 			
-			if(id == parent_id)
-				commons.resFail(res, 1, "父级分类不能为当前选中分类");
-			else {
-				models.DataClass.update(
-					{
-						name: name,
-						sort: parseInt(req.query.sort),
-						type: parseInt(req.query.type)
-					},
-					{
+			models.DataClass.update(
+				{
+					name: name,
+					sort: parseInt(req.query.sort),
+					type: parseInt(req.query.type)
+				},
+				{
+					where: {
 						id: id
 					}
-				).on("success", function(data) {
-					commons.resSuccess(res, "更新成功");
-				}).on("failure", function(err) {
-					commons.resFail(res, 1, err);
-				});				
-			}
+				}
+			).on("success", function(data) {
+				commons.resSuccess(res, "更新成功");
+			}).on("failure", function(err) {
+				commons.resFail(res, 1, err);
+			});
 			
 		}
 		else {
@@ -402,22 +397,29 @@ exports.ajaxDataClassDel = function(req, res) {
 		
 		var id = parseInt(req.query.id);		
 		
-		models.DataClass.destroy({
-			id: id
+		//删除该分类下的数据
+		models.Data.destroy({
+			where: {
+				dataclass_id: id
+			}
 		}).on("success", function(data) {
 			
-			//删除该分类下的数据
-			models.Data.destroy({
-				dataclass_id: id			
+			//删除分类
+			models.DataClass.destroy({
+				where: {
+					id: id
+				}
 			}).on("success", function(data) {
-				commons.resSuccess(res, "删除成功");
+				commons.resSuccess(res, "删除成功");				
 			}).on("failure", function(err) {
 				commons.resFail(res, 1, err);
 			});
-			
+						
 		}).on("failure", function(err) {
 			commons.resFail(res, 1, err);
-		});		
+		});
+		
+		
 				
 	}
 };
@@ -428,7 +430,10 @@ function data_list(data, total, page, page_size, page_count, res) {
 	data[tmpIndex].getDataClass().on("success", 
 		function(dataclass) {
 			data[tmpIndex].dataValues.dataclass = dataclass;
-						
+			
+			var dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
+			data[tmpIndex].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+			
 			//最后一条数据
 			if(tmpIndex + 1 >= data.length) {									
 				var res_data = {
@@ -483,6 +488,18 @@ exports.ajaxDataList = function(req, res) {
 					order: "sort desc, id desc"
 				}).on("success", function(data) {
 					
+					if(data.length == 0) {
+						var res_data = {
+							page: page,
+							page_size: page_size,
+							page_count: page_count,
+							total: total,
+							list: []
+						};
+						commons.resSuccess(res, "请求成功", res_data);
+						return;
+					}
+					
 					tmpIndex = 0;
 					data_list(data, total, page, page_size, page_count, res);
 					
@@ -509,7 +526,20 @@ exports.ajaxDataGet = function(req, res) {
 				id: id
 			}
 		}).on("success", function(data) {
-			commons.resSuccess(res, "请求成功", data);
+			
+			if(!data) {
+				commons.resFail(res, 1, "找不到数据");
+				return;
+			}
+			
+			data.getDataClass().on("success", 
+				function(dataclass) {
+					data.dataValues.dataclass = dataclass;
+					commons.resSuccess(res, "请求成功", data);
+				}
+			);
+			
+			
 		}).on("failure", function(err) {
 			commons.resFail(res, 1, err);
 		});
@@ -539,34 +569,30 @@ exports.ajaxDataAdd = function(req, res) {
 			commons.resFail(res, 1, "内容不能为空");
 			return;
 		}			
-		content = req.body.content;
-				
-		var data = null;
+		content = req.body.content;		
 		
 		if(id != 0) {
 			//更新
 			
-			if(id == parent_id)
-				commons.resFail(res, 1, "父级分类不能为当前选中分类");
-			else {
-				models.Data.update(
-					{
-						name: name,
-						content: content,
-						dataclass_id: parseInt(req.body.dataclass_id),
-						sort: parseInt(req.body.sort),
-						type: parseInt(req.body.type),
-						picture: ""
-					},
-					{
+			models.Data.update(
+				{
+					name: name,
+					content: content,
+					dataclass_id: parseInt(req.body.dataclass_id),
+					sort: parseInt(req.body.sort),
+					type: parseInt(req.body.type),
+					picture: ""
+				},
+				{
+					where: {
 						id: id
 					}
-				).on("success", function(data) {
-					commons.resSuccess(res, "更新成功");
-				}).on("failure", function(err) {
-					commons.resFail(res, 1, err);
-				});				
-			}
+				}
+			).on("success", function(data) {
+				commons.resSuccess(res, "更新成功");
+			}).on("failure", function(err) {
+				commons.resFail(res, 1, err);
+			});
 			
 		}
 		else {
@@ -597,7 +623,9 @@ exports.ajaxDataDel = function(req, res) {
 	else {
 		var id = parseInt(req.query.id);
 		models.Data.destroy({
-			id: id
+			where: {
+				id: id
+			}
 		}).on("success", function(data) {
 			commons.resSuccess(res, "删除成功");
 		}).on("failure", function(err) {
