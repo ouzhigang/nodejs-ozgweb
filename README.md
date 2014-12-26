@@ -19,6 +19,9 @@ npm install sequelize
 npm install sqlite3
 
 
+ckeditor需要自行下载，对应目录nodejs-ozgweb/static/js/ckeditor
+
+
 运行node main.js
 
 
