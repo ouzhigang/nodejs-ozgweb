@@ -336,8 +336,8 @@ exports.ajaxDataClassAdd = (req, res) ->
 			models.DataClass.update(
 				{
 					name: name,
-					sort: parseInt req.query.sort,
-					type: parseInt req.query.type
+					sort: parseInt(req.query.sort),
+					type: parseInt(req.query.type)
 				},
 				{
 					where: {
@@ -354,8 +354,8 @@ exports.ajaxDataClassAdd = (req, res) ->
 			#添加
 			models.DataClass.create({
 				name: name,
-				sort: parseInt req.query.sort,
-				type: parseInt req.query.type
+				sort: parseInt(req.query.sort),
+				type: parseInt(req.query.type)
 			}).on("success", (data) ->
 				commons.resSuccess res, "添加成功"
 			).on("failure", (err) ->
@@ -530,9 +530,9 @@ exports.ajaxDataAdd = (req, res) ->
 				{
 					name: name,
 					content: content,
-					dataclass_id: parseInt req.body.dataclass_id,
-					sort: parseInt req.body.sort,
-					type: parseInt req.body.type,
+					dataclass_id: parseInt(req.body.dataclass_id),
+					sort: parseInt(req.body.sort),
+					type: parseInt(req.body.type),
 					picture: ""
 				},
 				{
@@ -552,9 +552,9 @@ exports.ajaxDataAdd = (req, res) ->
 				name: name,
 				content: content,
 				add_time: parseInt((new Date()).getTime() / 1000),
-				dataclass_id: parseInt req.body.dataclass_id,
-				sort: parseInt req.body.sort,
-				type: parseInt req.body.type,
+				dataclass_id: parseInt(req.body.dataclass_id),
+				sort: parseInt(req.body.sort),
+				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
 			}).on("success", (data) ->
