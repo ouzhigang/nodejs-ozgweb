@@ -38,6 +38,7 @@ exports.ajaxLogin = (req, res) ->
 		
 	name = req.query.name
 	pwd = req.query.pwd
+	code = req.query.code
 	
 	if !name || name == ""
 		commons.resFail res, 1, "用户名不能为空"
