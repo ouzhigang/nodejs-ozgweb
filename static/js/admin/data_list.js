@@ -35,7 +35,7 @@ function show_data(list) {
 		var page = curr_page;
 		$("#menu_param").val("type:" + get_menu_param("type") + ",id:" + id + ",page:" + page);
 		
-		$("#center-column").load("../../static/simple/admin_templates/data_add.html?random=" + Math.random());
+		$("#center-column").load("../../admin_templates/data_add.html?random=" + Math.random());
 		
 		return false;
 	});
@@ -121,7 +121,7 @@ $(function() {
 	//添加按钮
 	$("#add_btn").click(function() {
 		$("#menu_param").val("type:" + get_menu_param("type"));
-		$("#center-column").load("../../static/simple/admin_templates/data_add.html?random=" + Math.random());
+		$("#center-column").load("../../admin_templates/data_add.html?random=" + Math.random());
 		return false;
 	});
 	

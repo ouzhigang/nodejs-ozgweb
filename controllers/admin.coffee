@@ -108,8 +108,8 @@ exports.ajaxAdminList = (req, res) ->
 				}).on("success", (data) ->
 					
 					for i in data
-						dt = new Date (parseInt data[i].add_time) * 1000						
-						data[i].add_time = dt.format "yyyy-MM-dd hh:mm:ss"
+						dt = new Date (parseInt i.add_time) * 1000						
+						i.add_time = dt.format "yyyy-MM-dd hh:mm:ss"
 										
 					res_data = {
 						page: page,
@@ -158,7 +158,7 @@ exports.ajaxAdminAdd = (req, res) ->
 				admin = {
 					name: name,
 					pwd: pwd,
-					add_time: parseInt ((new Date).getTime / 1000)
+					add_time: parseInt ((new Date()).getTime() / 1000)
 				}
 				
 				(models.Admin.create admin).on("success", (data) ->
@@ -332,8 +332,8 @@ exports.ajaxDataClassAdd = (req, res) ->
 			models.DataClass.update(
 				{
 					name: name,
-					sort: parseInt(req.query.sort),
-					type: parseInt(req.query.type)
+					sort: parseInt req.query.sort,
+					type: parseInt req.query.type
 				},
 				{
 					where: {
@@ -390,7 +390,7 @@ exports.ajaxDataClassDel = (req, res) ->
 #ajaxDataList用到的递归获取data表的数据
 data_list = (data, total, page, page_size, page_count, res) ->
 	
-	(data[tmpIndex].getDataClass).on("success", 
+	(data[tmpIndex].getDataClass()).on("success", 
 		(dataclass) ->
 			data[tmpIndex].dataValues.dataclass = dataclass
 			
@@ -487,7 +487,7 @@ exports.ajaxDataGet = (req, res) ->
 				commons.resFail res, 1, "找不到数据"
 				return			
 			
-			(data.getDataClass).on("success", 
+			(data.getDataClass()).on("success", 
 				(dataclass) ->
 					data.dataValues.dataclass = dataclass
 					commons.resSuccess res, "请求成功", data				
@@ -547,7 +547,7 @@ exports.ajaxDataAdd = (req, res) ->
 			models.Data.create({
 				name: name,
 				content: content,
-				add_time: parseInt ((new Date).getTime / 1000),
+				add_time: parseInt((new Date()).getTime() / 1000),
 				dataclass_id: parseInt req.body.dataclass_id,
 				sort: parseInt req.body.sort,
 				type: parseInt req.body.type,

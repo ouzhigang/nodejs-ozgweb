@@ -14,7 +14,7 @@ $(function() {
 		
 		if($("#dataclass").val() != "0") {
 			$("#menu_param").val("type:" + get_menu_param("type") + ",id:" + $("#dataclass").val());
-			$("#center-column").load("../../static/simple/admin_templates/dataclass_add.html?random=" + Math.random());
+			$("#center-column").load("../../admin_templates/dataclass_add.html?random=" + Math.random());
 		}
 		else
 			alert("请选择分类");
@@ -53,7 +53,7 @@ $(function() {
 	
 	//添加按钮
 	$("#add_btn").click(function() {
-		$("#center-column").load("../../static/simple/admin_templates/dataclass_add.html?random=" + Math.random());
+		$("#center-column").load("../../admin_templates/dataclass_add.html?random=" + Math.random());
 		return false;
 	});	
 });

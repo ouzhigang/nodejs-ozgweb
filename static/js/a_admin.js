@@ -78,7 +78,7 @@ function left_menu2_click() {
 						if(item_obj_child2.param)
 							$("#menu_param").val(item_obj_child2.param);
 					
-						$("#center-column").load("../../static/simple/admin_templates/" + item_obj_child2.url + "?random=" + Math.random());
+						$("#center-column").load("../../admin_templates/" + item_obj_child2.url + "?random=" + Math.random());
 					}
 				});
 			});
@@ -167,6 +167,6 @@ $(function() {
 	});
 	
 	//中间的界面部分
-	$("#center-column").load("../../static/simple/admin_templates/main.html");
+	$("#center-column").load("../../admin_templates/main.html");
 	
 });
