@@ -4,6 +4,7 @@ var commons = require("../commons");
 var models = require("../models");
 var os = require("os");
 var ccap = require("ccap");
+var process = require("process");
 
 var tmpIndex = 0; //临时使用的索引
 
@@ -19,7 +20,7 @@ exports.admin = function(req, res) {
 		var res_data = {
 			sys_type: os.type(),
 			sys_ver: os.release(),
-			sys_platform: os.platform(),
+			nodejs_ver: process.versions.node,
 			sess_admin: req.session.sess_admin
 		};
 		

@@ -2,6 +2,8 @@
 
 npm install ccap （需要安装python2.7）
 
+npm install process
+
 npm install body-parser
 
 npm install cookie-parser
