@@ -20,6 +20,10 @@ npm install sequelize
 
 npm install sqlite3
 
+
+ckeditor需要自行下载，对应目录nodejs-ozgweb/static/js/ckeditor
+
+
 运行coffee main.coffee
 
 后台入口：http://localhost:8000/admin/index
