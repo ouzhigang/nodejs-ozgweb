@@ -1,0 +1,50 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title><%= cfg_webname %> - 后台管理</title>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<style media="all" type="text/css">@import "../css/a_all.css";</style>
+	<style media="all" type="text/css">@import "../css/jquery/pagination.css";</style>
+	<script src="<%= cfg_jquery %>"></script>
+	<script src="../js/md5.js"></script>
+	<script src="../js/a_admin.js"></script>
+	<script src="../js/jquery/jquery.pagination.js"></script>
+</head>
+<body>
+<div id="main">
+	<div id="header">
+		<!--上面的菜单-->
+		<ul id="top-navigation">
+		</ul>
+	</div>
+	<div id="middle">
+		<!--参数-->
+		<input type="hidden" id="menu_param" />
+		<!--左边菜单-->
+		<div id="left-column">			
+		</div>
+		<div id="center-column">
+			<!--内容部分-->
+		</div>
+		<div id="right-column">
+			<strong class="h">当前用户</strong>
+			<div class="box">
+				<div>用户名:<%= res_data.sess_admin.name %></div>
+				<div><a href="#" id="logout"><b>退出登录</b></a></div>
+			</div>
+	    </div>
+		<div id="right-column">
+			<strong class="h">系统信息</strong>
+			<div class="box">
+				<div>System:<%= res_data.sys_type %></div>
+				<div>Version:<%= res_data.sys_ver %></div>
+				<div>NodeJS:<%= res_data.nodejs_ver %></div>
+				<div><a href="https://github.com/ouzhigang/nodejs-ozgweb" target="_blank"><b>GitHub</b></a></div>
+			</div>
+	    </div>
+	</div>
+	<div id="footer"></div>
+</div>
+
+</body>
+</html>

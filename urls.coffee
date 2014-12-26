@@ -9,7 +9,7 @@ exports.startUrls = (app) ->
 	this.app = app
 	app.get "/admin/index", admin.index
 	app.get "/admin/admin", admin.admin
-	#app.get "/admin/get_code", admin.getCode
+	app.get "/admin/get_code", admin.getCode
 	app.get "/admin/ajax_login", admin.ajaxLogin
 	app.get "/admin/ajax_logout", admin.ajaxLogout
 	app.get "/admin/ajax_menu_list", admin.ajaxMenuList

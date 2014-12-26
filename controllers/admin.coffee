@@ -3,6 +3,8 @@ cfg = require "../cfg"
 commons = require "../commons"
 models = require "../models"
 os = require "os"
+ccap = require "ccap"
+process = require "process"
 
 tmpIndex = 0 #临时使用的索引
 
@@ -15,16 +17,22 @@ exports.admin = (req, res) ->
 		res.redirect "index"
 	else
 		res_data = {
-			sys_type: os.type,
-			sys_ver: os.release,
-			sys_platform: os.platform,
+			sys_type: os.type(),
+			sys_ver: os.release(),
+			nodejs_ver: process.versions.node,
 			sess_admin: req.session.sess_admin
 		}
 		
 		commons.renderTemplate res, "admin/admin.html", res_data	
 
-#exports.getCode = (req, res) ->
-	#res.send "暂无验证码"
+exports.getCode = (req, res) ->
+	captcha = ccap()
+	ary = captcha.get()
+	text = ary[0]
+	buffer = ary[1]
+	req.session.captcha_text = text
+	res.set "Content-Type", "image/bmp"
+	res.send buffer
 
 exports.ajaxLogin = (req, res) ->
 		
@@ -33,8 +41,10 @@ exports.ajaxLogin = (req, res) ->
 	
 	if !name || name == ""
 		commons.resFail res, 1, "用户名不能为空"
+		return
 	if !pwd || pwd == ""
 		commons.resFail res, 1, "密码不能为空"
+		return
 	
 	models.Admin.find({
 		where: {
@@ -129,10 +139,13 @@ exports.ajaxAdminAdd = (req, res) ->
 		
 		if !name || name == ""
 			commons.resFail res, 1, "用户名不能为空"
+			return
 		if !pwd || pwd == ""
 			commons.resFail res, 1, "密码不能为空"
+			return
 		if pwd != pwd2
 			commons.resFail res, 1, "确认密码不正确"
+			return
 		
 		models.Admin.count({
 			where: {
@@ -185,10 +198,13 @@ exports.ajaxAdminUpdatePwd = (req, res) ->
 		
 		if !req.query.old_pwd || old_pwd == ""
 			commons.resFail res, 1, "旧密码不能为空"
+			return
 		if !req.query.pwd || pwd == ""
 			commons.resFail res, 1, "新密码不能为空"
+			return
 		if pwd != pwd2
 			commons.resFail res, 1, "确认密码不正确"
+			return
 		
 		models.Admin.count({
 			where: {
@@ -198,7 +214,7 @@ exports.ajaxAdminUpdatePwd = (req, res) ->
 		}).on("success", (total) ->
 			
 			if total == 0
-				commons.resFail res, 1, "旧密码不正确"			
+				commons.resFail res, 1, "旧密码不正确"
 			else
 				models.Admin.update(
 					{
