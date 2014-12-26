@@ -45,6 +45,9 @@ exports.ajaxLogin = (req, res) ->
 	if !pwd || pwd == ""
 		commons.resFail res, 1, "密码不能为空"
 		return
+	if code.toLowerCase() != req.session.captcha_text.toLowerCase()
+		commons.resFail res, 1, "验证码错误"
+		return
 	
 	models.Admin.find({
 		where: {
