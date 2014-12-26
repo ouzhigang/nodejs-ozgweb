@@ -1,4 +1,6 @@
-所需的库
+所需的库（速度太慢可使用cnpm来安装）
+
+npm install ccap （需要安装python2.7）
 
 npm install body-parser
 

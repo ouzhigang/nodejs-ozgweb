@@ -3,6 +3,7 @@ var cfg = require("../cfg");
 var commons = require("../commons");
 var models = require("../models");
 var os = require("os");
+var ccap = require("ccap");
 
 var tmpIndex = 0; //临时使用的索引
 
@@ -26,19 +27,37 @@ exports.admin = function(req, res) {
 	}	
 };
 
-/*exports.getCode = function(req, res) {
-	res.send("暂无验证码");
-};*/
+exports.getCode = function(req, res) {
+	var captcha = ccap();
+	var ary = captcha.get();
+
+	var text = ary[0];
+	var buffer = ary[1];
+	
+	req.session.captcha_text = text;
+	
+	res.set("Content-Type", "image/bmp");
+	res.send(buffer);
+};
 
 exports.ajaxLogin = function(req, res) {
 		
 	var name = req.query.name;
 	var pwd = req.query.pwd;
+	var code = req.query.code;
 	
-	if(!name || name == "")
-		commons.resFail(res, 1, "用户名不能为空");	
-	if(!pwd || pwd == "")
+	if(!name || name == "") {
+		commons.resFail(res, 1, "用户名不能为空");
+		return;
+	}
+	if(!pwd || pwd == "") {
 		commons.resFail(res, 1, "密码不能为空");
+		return;
+	}
+	if(code.toLowerCase() != req.session.captcha_text.toLowerCase()) {
+		commons.resFail(res, 1, "验证码错误");
+		return;
+	}
 	
 	models.Admin.find({
 		where: {
@@ -143,12 +162,18 @@ exports.ajaxAdminAdd = function(req, res) {
 		var pwd = req.query.pwd;
 		var pwd2 = req.query.pwd2;
 		
-		if(!name || name == "")
+		if(!name || name == "") {
 			commons.resFail(res, 1, "用户名不能为空");
-		if(!pwd || pwd == "")
+			return;
+		}
+		if(!pwd || pwd == "") {
 			commons.resFail(res, 1, "密码不能为空");
-		if(pwd != pwd2)
+			return;
+		}
+		if(pwd != pwd2) {
 			commons.resFail(res, 1, "确认密码不正确");
+			return;
+		}
 		
 		models.Admin.count({
 			where: {
@@ -207,12 +232,18 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 		var pwd = req.query.pwd;
 		var pwd2 = req.query.pwd2;
 		
-		if(!req.query.old_pwd || old_pwd == "")
+		if(!req.query.old_pwd || old_pwd == "") {
 			commons.resFail(res, 1, "旧密码不能为空");
-		if(!req.query.pwd || pwd == "")
+			return;
+		}
+		if(!req.query.pwd || pwd == "") {
 			commons.resFail(res, 1, "新密码不能为空");
-		if(pwd != pwd2)
+			return;
+		}
+		if(pwd != pwd2) {
 			commons.resFail(res, 1, "确认密码不正确");
+			return;
+		}
 		
 		models.Admin.count({
 			where: {
@@ -419,8 +450,6 @@ exports.ajaxDataClassDel = function(req, res) {
 			commons.resFail(res, 1, err);
 		});
 		
-		
-				
 	}
 };
 
@@ -538,8 +567,7 @@ exports.ajaxDataGet = function(req, res) {
 					commons.resSuccess(res, "请求成功", data);
 				}
 			);
-			
-			
+						
 		}).on("failure", function(err) {
 			commons.resFail(res, 1, err);
 		});
