@@ -1,5 +1,6 @@
 
-cfg = require("./cfg");
+var cfg = require("./cfg");
+var process = require("process");
 
 Date.prototype.format = function(format) {
 	
@@ -74,4 +75,15 @@ exports.pageCount = function(count, page_size) {
 		return parseInt(count / page_size);
 	else
 		return parseInt((count / page_size) + 1);
+};
+
+//获取运行环境node,coffee,iojs
+exports.getRunEnv = function() {
+	
+	var argv = process.argv;
+	if(argv.length > 0)
+		return argv[0];
+	
+	//默认为node
+	return "node";
 };

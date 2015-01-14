@@ -20,7 +20,8 @@ exports.admin = function(req, res) {
 		var res_data = {
 			sys_type: os.type(),
 			sys_ver: os.release(),
-			nodejs_ver: process.versions.node,
+			server: commons.getRunEnv(),
+			server_ver: process.versions.node,
 			sess_admin: req.session.sess_admin
 		};
 		
