@@ -1,5 +1,6 @@
 
 cfg = require "./cfg"
+process = require "process"
 
 Date.prototype.format = (formatStr) ->
 	o = {
@@ -68,3 +69,12 @@ exports.pageCount = (count, page_size) ->
 		return parseInt (count / page_size)
 	else
 		return parseInt (count / page_size) + 1
+
+#获取运行环境node,coffee,iojs
+exports.getRunEnv = () ->	
+	argv = process.argv
+	if argv.length > 0
+		return argv[0]
+	
+	#默认为coffee
+	return "coffee"

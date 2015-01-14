@@ -16,10 +16,17 @@ exports.admin = (req, res) ->
 	if !req.session.sess_admin
 		res.redirect "index"
 	else
+	
+		server = commons.getRunEnv()
+		if server == "coffee"
+			server += ":???" #不知道怎么获取coffeescript的版本号
+		else
+			server += process.versions.node
+	
 		res_data = {
 			sys_type: os.type(),
 			sys_ver: os.release(),
-			nodejs_ver: process.versions.node,
+			server: server,
 			sess_admin: req.session.sess_admin
 		}
 		
