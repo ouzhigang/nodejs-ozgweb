@@ -17,11 +17,17 @@ exports.admin = function(req, res) {
 	if(!req.session.sess_admin)
 		res.redirect("index");
 	else {
+		
+		var server = commons.getRunEnv();
+		if(server == "coffee")
+			server += ":???";
+		else
+			server += ":" + process.versions.node;
+		
 		var res_data = {
 			sys_type: os.type(),
 			sys_ver: os.release(),
-			server: commons.getRunEnv(),
-			server_ver: process.versions.node,
+			server: server,
 			sess_admin: req.session.sess_admin
 		};
 		
