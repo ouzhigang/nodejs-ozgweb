@@ -21,7 +21,7 @@ exports.admin = (req, res) ->
 		if server == "coffee"
 			server += ":???" #不知道怎么获取coffeescript的版本号
 		else
-			server += process.versions.node
+			server += ":" + process.versions.node
 	
 		res_data = {
 			sys_type: os.type(),
