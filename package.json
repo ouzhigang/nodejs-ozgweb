@@ -1,0 +1,32 @@
+{
+  "name": "nodejs-ozgweb",
+  "version": "1.0.0",
+  "description": "nodejs-ozgweb",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ouzhigang/nodejs-ozgweb"
+  },
+  "keywords": [
+    "nodejsweb"
+  ],
+  "author": "ozg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ouzhigang/nodejs-ozgweb/issues"
+  },
+  "homepage": "https://github.com/ouzhigang/nodejs-ozgweb",
+  "dependencies": {
+    "body-parser": "^1.12.3",
+    "cookie-parser": "^1.3.4",
+    "cookie-session": "^1.1.0",
+    "ejs": "^2.3.1",
+    "express": "^4.12.3",
+    "process": "^0.10.1",
+    "sequelize": "^2.0.6",
+    "sqlite3": "^3.0.5"
+  }
+}

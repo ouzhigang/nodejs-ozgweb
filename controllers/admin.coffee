@@ -3,7 +3,6 @@ cfg = require "../cfg"
 commons = require "../commons"
 models = require "../models"
 os = require "os"
-ccap = require "ccap"
 process = require "process"
 
 tmpIndex = 0 #临时使用的索引
@@ -32,29 +31,16 @@ exports.admin = (req, res) ->
 		
 		commons.renderTemplate res, "admin/admin.html", res_data	
 
-exports.getCode = (req, res) ->
-	captcha = ccap()
-	ary = captcha.get()
-	text = ary[0]
-	buffer = ary[1]
-	req.session.captcha_text = text
-	res.set "Content-Type", "image/bmp"
-	res.send buffer
-
 exports.ajaxLogin = (req, res) ->
 		
 	name = req.query.name
 	pwd = req.query.pwd
-	code = req.query.code
 	
 	if !name || name == ""
 		commons.resFail res, 1, "用户名不能为空"
 		return
 	if !pwd || pwd == ""
 		commons.resFail res, 1, "密码不能为空"
-		return
-	if code.toLowerCase() != req.session.captcha_text.toLowerCase()
-		commons.resFail res, 1, "验证码错误"
 		return
 	
 	models.Admin.find({
