@@ -38,7 +38,6 @@ exports.ajaxLogin = function(req, res) {
 		
 	var name = req.query.name;
 	var pwd = req.query.pwd;
-	var code = req.query.code;
 	
 	if(!name || name == "") {
 		commons.resFail(res, 1, "用户名不能为空");
