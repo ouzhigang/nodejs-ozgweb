@@ -3,7 +3,6 @@ var cfg = require("../cfg");
 var commons = require("../commons");
 var models = require("../models");
 var os = require("os");
-var ccap = require("ccap");
 var process = require("process");
 
 var tmpIndex = 0; //临时使用的索引
@@ -35,19 +34,6 @@ exports.admin = function(req, res) {
 	}	
 };
 
-exports.getCode = function(req, res) {
-	var captcha = ccap();
-	var ary = captcha.get();
-
-	var text = ary[0];
-	var buffer = ary[1];
-	
-	req.session.captcha_text = text;
-	
-	res.set("Content-Type", "image/bmp");
-	res.send(buffer);
-};
-
 exports.ajaxLogin = function(req, res) {
 		
 	var name = req.query.name;
@@ -60,10 +46,6 @@ exports.ajaxLogin = function(req, res) {
 	}
 	if(!pwd || pwd == "") {
 		commons.resFail(res, 1, "密码不能为空");
-		return;
-	}
-	if(code.toLowerCase() != req.session.captcha_text.toLowerCase()) {
-		commons.resFail(res, 1, "验证码错误");
 		return;
 	}
 	
