@@ -568,7 +568,7 @@ exports.ajaxDataAdd = function(req, res) {
 				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
-			}),then(function(data) {
+			}).then(function(data) {
 				commons.resSuccess(res, "添加成功");
 			});
 			
