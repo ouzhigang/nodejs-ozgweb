@@ -7,11 +7,11 @@ var process = require("process");
 
 var tmpIndex = 0; //临时使用的索引
 
-exports.index = function(req, res) {
+exports.actionIndex = function(req, res) {
 	commons.renderTemplate(res, "admin/index.html");
 };
 
-exports.admin = function(req, res) {
+exports.actionAdmin = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)
 		res.redirect("index");

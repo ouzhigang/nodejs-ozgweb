@@ -6,8 +6,8 @@ var app = null;
 
 exports.startUrls = function(app) {
 	this.app = app;
-	app.get("/admin/index", admin.index);
-	app.get("/admin/admin", admin.admin);
+	app.get("/admin/index", admin.actionIndex);
+	app.get("/admin/admin", admin.actionAdmin);
 	app.get("/admin/ajax_login", admin.ajaxLogin);
 	app.get("/admin/ajax_logout", admin.ajaxLogout);
 	app.get("/admin/ajax_menu_list", admin.ajaxMenuList);
