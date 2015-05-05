@@ -258,7 +258,7 @@ exports.ajaxArtSingleGet = function(req, res) {
 			where: {
 				id: id
 			}
-		}).then(function() {
+		}).then(function(data) {
 			commons.resSuccess(res, "请求成功", data);
 		});
 		
