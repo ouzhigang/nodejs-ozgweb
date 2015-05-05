@@ -53,7 +53,7 @@ exports.ajaxLogin = function(req, res) {
 			name: req.query.name,
 			pwd: req.query.pwd
 		}
-	}).on("success", function(data) {
+	}).then(function(data) {
 		if(data) {
 			req.session.sess_admin = {
 				name: data.name,
@@ -65,8 +65,6 @@ exports.ajaxLogin = function(req, res) {
 		else {
 			commons.resFail(res, 1, "用户名或密码错误");
 		}
-	}).on("failure", function(err) {
-		commons.resFail(res, 1, err);
 	});
 	
 };
@@ -104,38 +102,30 @@ exports.ajaxAdminList = function(req, res) {
 		if(req.query.page_size)
 			page_size = parseInt(req.query.page_size);
 		
-		models.Admin.count().on("success", 
-			function(total) {
-				
-				var page_count = commons.pageCount(total, page_size);
-				var offset = parseInt((page - 1) * page_size);
+		models.Admin.count().then(function(total) {
+			var page_count = commons.pageCount(total, page_size);
+			var offset = parseInt((page - 1) * page_size);
 
-				models.Admin.findAll({
-					limit: offset + ", " + page_size,
-					order: "id desc"
-				}).on("success", function(data) {
-					
-					for(var i in data) {						
-						var dt = new Date(parseInt(data[i].add_time) * 1000);						
-						data[i].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
-					}
-					
-					var res_data = {
-						page: page,
-						page_size: page_size,
-						page_count: page_count,
-						total: total,
-						list: data
-					};
-					commons.resSuccess(res, "请求成功", res_data);
-					
-				}).on("failure", function(err) {		
-					commons.resFail(res, 1, err);
-				});
+			models.Admin.findAll({
+				limit: offset + ", " + page_size,
+				order: "id desc"
+			}).then(function(data) {
 				
-			}
-		).on("failure", function(err) {
-			commons.resFail(res, 1, err);
+				for(var i in data) {						
+					var dt = new Date(parseInt(data[i].add_time) * 1000);						
+					data[i].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+				}
+				
+				var res_data = {
+					page: page,
+					page_size: page_size,
+					page_count: page_count,
+					total: total,
+					list: data
+				};
+				commons.resSuccess(res, "请求成功", res_data);
+			});
+			
 		});
 		
 	}
@@ -168,7 +158,7 @@ exports.ajaxAdminAdd = function(req, res) {
 			where: {
 				name: name
 			}
-		}).on("success", function(total) {
+		}).then(function(total) {
 			if(total > 0)
 				commons.resFail(res, 1, "该管理员已存在");
 			else {
@@ -179,15 +169,11 @@ exports.ajaxAdminAdd = function(req, res) {
 					add_time: parseInt((new Date()).getTime() / 1000)
 				};
 				
-				models.Admin.create(admin).on("success", function(data) {
+				models.Admin.create(admin).then(function(data) {
 					commons.resSuccess(res, "添加成功", admin);
-				}).on("failure", function(err) {
-					commons.resFail(res, 1, err);
 				});
 				
-			}			
-		}).on("failure", function(err) {		
-			commons.resFail(res, 1, err);
+			}
 		});
 		
 	}
@@ -203,12 +189,10 @@ exports.ajaxAdminDel = function(req, res) {
 			where: {
 				id: id			
 			}
-		}).on("success", function(msg) {
+		}).then(function(msg) {
 			commons.resSuccess(res, "删除成功");
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
-		
+				
 	}
 };
 
@@ -239,8 +223,7 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 				name: req.session.sess_admin.name,
 				pwd: old_pwd
 			}
-		}).on("success", function(total) {
-			
+		}).then(function(total) {
 			if(total == 0) {
 				commons.resFail(res, 1, "旧密码不正确");
 			}
@@ -254,15 +237,11 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 							name: req.session.sess_admin.name
 						}
 					}
-				).on("success", function(data) {
-					commons.resSuccess(res, "修改密码成功");				
-				}).on("failure", function(err) {
-					commons.resFail(res, 1, err);
+				).then(function(data) {
+					commons.resSuccess(res, "修改密码成功");	
 				});
+				
 			}
-			
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
 		
 	}
@@ -279,10 +258,8 @@ exports.ajaxArtSingleGet = function(req, res) {
 			where: {
 				id: id
 			}
-		}).on("success", function(data) {
+		}).then(function() {
 			commons.resSuccess(res, "请求成功", data);
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
 		
 	}
@@ -306,10 +283,8 @@ exports.ajaxArtSingleUpdate = function(req, res) {
 					id: id
 				}
 			}
-		).on("success", function(data) {
+		).then(function(data) {
 			commons.resSuccess(res, "更新成功");
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
 		
 	}
@@ -330,12 +305,8 @@ exports.ajaxDataClassList = function(req, res) {
 				type: type
 			},
 			order: "sort desc, id desc"
-		}).on("success", function(data) {
-
+		}).then(function(data) {
 			commons.resSuccess(res, "请求成功", data);
-					
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
 		
 	}
@@ -352,10 +323,8 @@ exports.ajaxDataClassGet = function(req, res) {
 			where: {
 				id: id
 			}
-		}).on("success", function(data) {
+		}).then(function(data) {
 			commons.resSuccess(res, "请求成功", data);
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
 		
 	}
@@ -386,10 +355,8 @@ exports.ajaxDataClassAdd = function(req, res) {
 						id: id
 					}
 				}
-			).on("success", function(data) {
+			).then(function(data) {
 				commons.resSuccess(res, "更新成功");
-			}).on("failure", function(err) {
-				commons.resFail(res, 1, err);
 			});
 			
 		}
@@ -399,11 +366,10 @@ exports.ajaxDataClassAdd = function(req, res) {
 				name: name,
 				sort: parseInt(req.query.sort),
 				type: parseInt(req.query.type)
-			}).on("success", function(data) {
+			}).then(function(data) {
 				commons.resSuccess(res, "添加成功");
-			}).on("failure", function(err) {
-				commons.resFail(res, 1, err);
 			});
+			
 		}
 		
 	}
@@ -422,21 +388,16 @@ exports.ajaxDataClassDel = function(req, res) {
 			where: {
 				dataclass_id: id
 			}
-		}).on("success", function(data) {
-			
+		}).then(function(data) {
 			//删除分类
 			models.DataClass.destroy({
 				where: {
 					id: id
 				}
-			}).on("success", function(data) {
-				commons.resSuccess(res, "删除成功");				
-			}).on("failure", function(err) {
-				commons.resFail(res, 1, err);
+			}).then(function(data) {
+				commons.resSuccess(res, "删除成功");	
 			});
-						
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
+			
 		});
 		
 	}
@@ -445,30 +406,29 @@ exports.ajaxDataClassDel = function(req, res) {
 //ajaxDataList用到的递归获取data表的数据
 function data_list(data, total, page, page_size, page_count, res) {
 	
-	data[tmpIndex].getDataClass().on("success", 
-		function(dataclass) {
-			data[tmpIndex].dataValues.dataclass = dataclass;
+	data[tmpIndex].getDataClass().then(function(dataclass) {
+		data[tmpIndex].dataValues.dataclass = dataclass;
 			
-			var dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
-			data[tmpIndex].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
-			
-			//最后一条数据
-			if(tmpIndex + 1 >= data.length) {									
-				var res_data = {
-					page: page,
-					page_size: page_size,
-					page_count: page_count,
-					total: total,
-					list: data
-				};
-				commons.resSuccess(res, "请求成功", res_data);
-				return;
-			}
-			
-			tmpIndex++;
-			data_list(data, total, page, page_size, page_count, res);
+		var dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
+		data[tmpIndex].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+		
+		//最后一条数据
+		if(tmpIndex + 1 >= data.length) {									
+			var res_data = {
+				page: page,
+				page_size: page_size,
+				page_count: page_count,
+				total: total,
+				list: data
+			};
+			commons.resSuccess(res, "请求成功", res_data);
+			return;
 		}
-	);	
+		
+		tmpIndex++;
+		data_list(data, total, page, page_size, page_count, res);
+	});
+	
 }
 
 exports.ajaxDataList = function(req, res) {
@@ -493,41 +453,33 @@ exports.ajaxDataList = function(req, res) {
 			where: {
 				type: type
 			}
-		}).on("success", 
-			function(total) {
-				var page_count = commons.pageCount(total, page_size);
-				var offset = parseInt((page - 1) * page_size);
+		}).then(function(total) {
+			var page_count = commons.pageCount(total, page_size);
+			var offset = parseInt((page - 1) * page_size);
 
-				models.Data.findAll({
-					where: {
-						type: type
-					},
-					limit: offset + ", " + page_size,
-					order: "sort desc, id desc"
-				}).on("success", function(data) {
-					
-					if(data.length == 0) {
-						var res_data = {
-							page: page,
-							page_size: page_size,
-							page_count: page_count,
-							total: total,
-							list: []
-						};
-						commons.resSuccess(res, "请求成功", res_data);
-						return;
-					}
-					
-					tmpIndex = 0;
-					data_list(data, total, page, page_size, page_count, res);
-					
-				}).on("failure", function(err) {		
-					commons.resFail(res, 1, err);
-				});
+			models.Data.findAll({
+				where: {
+					type: type
+				},
+				limit: offset + ", " + page_size,
+				order: "sort desc, id desc"
+			}).then(function(data) {
+				if(data.length == 0) {
+					var res_data = {
+						page: page,
+						page_size: page_size,
+						page_count: page_count,
+						total: total,
+						list: []
+					};
+					commons.resSuccess(res, "请求成功", res_data);
+					return;
+				}
 				
-			}
-		).on("failure", function(err) {
-			commons.resFail(res, 1, err);
+				tmpIndex = 0;
+				data_list(data, total, page, page_size, page_count, res);
+			});
+			
 		});
 		
 	}
@@ -543,22 +495,17 @@ exports.ajaxDataGet = function(req, res) {
 			where: {
 				id: id
 			}
-		}).on("success", function(data) {
-			
+		}).then(function(data) {
 			if(!data) {
 				commons.resFail(res, 1, "找不到数据");
 				return;
 			}
 			
-			data.getDataClass().on("success", 
-				function(dataclass) {
-					data.dataValues.dataclass = dataclass;
+			data.getDataClass().then(function(dataclass) {
+				data.dataValues.dataclass = dataclass;
 					commons.resSuccess(res, "请求成功", data);
-				}
-			);
-						
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
+			});
+			
 		});
 		
 	}
@@ -605,10 +552,8 @@ exports.ajaxDataAdd = function(req, res) {
 						id: id
 					}
 				}
-			).on("success", function(data) {
+			).then(function(data) {
 				commons.resSuccess(res, "更新成功");
-			}).on("failure", function(err) {
-				commons.resFail(res, 1, err);
 			});
 			
 		}
@@ -623,11 +568,10 @@ exports.ajaxDataAdd = function(req, res) {
 				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
-			}).on("success", function(data) {
+			}),then(function(data) {
 				commons.resSuccess(res, "添加成功");
-			}).on("failure", function(err) {
-				commons.resFail(res, 1, err);
 			});
+			
 		}
 		
 	}
@@ -643,10 +587,9 @@ exports.ajaxDataDel = function(req, res) {
 			where: {
 				id: id
 			}
-		}).on("success", function(data) {
+		}).then(function(data) {
 			commons.resSuccess(res, "删除成功");
-		}).on("failure", function(err) {
-			commons.resFail(res, 1, err);
 		});
+		
 	}
 };
