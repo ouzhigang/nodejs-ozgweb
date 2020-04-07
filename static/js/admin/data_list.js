@@ -106,15 +106,8 @@ $(function() {
 	$.getJSON(
 		url,
 		function(data) {
-			if(data.data.page_count == 1) {
-				$(".pagetable").hide(); //只有一页的话就不显示分页导航
-				
-				show_data(data.data.list);
-			}
-			else {
-				show_data(data.data.list);
-				update_page_nav(data.data);
-			}
+			show_data(data.data.list);
+			update_page_nav(data.data);
 		}
 	);
 	
