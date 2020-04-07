@@ -48,7 +48,7 @@ exports.ajaxLogin = function(req, res) {
 		return;
 	}
 	
-	models.Admin.find({
+	models.Admin.findOne({
 		where: {
 			name: req.query.name,
 			pwd: req.query.pwd
@@ -107,10 +107,13 @@ exports.ajaxAdminList = function(req, res) {
 			var offset = parseInt((page - 1) * page_size);
 
 			models.Admin.findAll({
-				limit: offset + ", " + page_size,
-				order: "id desc"
+				offset: offset,
+				limit: page_size,
+				order: [
+					[ "id", "desc" ]
+				]
 			}).then(function(data) {
-				
+
 				for(var i in data) {						
 					var dt = new Date(parseInt(data[i].add_time) * 1000);						
 					data[i].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
@@ -254,7 +257,7 @@ exports.ajaxArtSingleGet = function(req, res) {
 	else {
 		var id = parseInt(req.query.id);
 		
-		models.ArtSingle.find({
+		models.ArtSingle.findOne({
 			where: {
 				id: id
 			}
@@ -304,7 +307,10 @@ exports.ajaxDataClassList = function(req, res) {
 			where: {
 				type: type
 			},
-			order: "sort desc, id desc"
+			order: [
+				[ "sort", "desc" ],
+				[ "id", "desc" ]
+			]
 		}).then(function(data) {
 			commons.resSuccess(res, "请求成功", data);
 		});
@@ -319,7 +325,7 @@ exports.ajaxDataClassGet = function(req, res) {
 	else {
 		var id = parseInt(req.query.id);
 
-		models.DataClass.find({
+		models.DataClass.findOne({
 			where: {
 				id: id
 			}
@@ -461,8 +467,12 @@ exports.ajaxDataList = function(req, res) {
 				where: {
 					type: type
 				},
-				limit: offset + ", " + page_size,
-				order: "sort desc, id desc"
+				offset: offset,
+				limit: page_size,
+				order: [
+					[ "sort", "desc" ],
+					[ "id", "desc" ]
+				]
 			}).then(function(data) {
 				if(data.length == 0) {
 					var res_data = {
@@ -491,7 +501,7 @@ exports.ajaxDataGet = function(req, res) {
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		var id = parseInt(req.query.id);
-		models.Data.find({
+		models.Data.findOne({
 			where: {
 				id: id
 			}
