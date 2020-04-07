@@ -3,19 +3,19 @@ $(function() {
 	
 	//获取分类数据
 	$.getJSON(
-		"ajax_dataclass_list?type=" + get_menu_param("type") + "&random=" + Math.random(),
+		"ajax_data_cat_list?type=" + get_menu_param("type") + "&random=" + Math.random(),
 		function(data) {
 			//show_data(data.data);
 			
 			if(get_menu_param("id")) {
 				//编辑状态
 				$.getJSON(
-					"ajax_dataclass_get?id=" + get_menu_param("id") + "&random=" + Math.random(),
+					"ajax_data_cat_get?id=" + get_menu_param("id") + "&random=" + Math.random(),
 					function(data) {
 						$("#title").html("修改分类");
 						
 						$("#name").val(data.data.name);
-						//$("#dataclass").val(data.data.parent_id);
+						//$("#data_cat").val(data.data.parent_id);
 						$("#sort").val(data.data.sort);
 						
 						$("#btn_submit").val("更新");
@@ -37,9 +37,9 @@ $(function() {
 		else {
 			var url = null;
 			if(get_menu_param("id"))
-				url = "ajax_dataclass_add?id=" + get_menu_param("id") + "&name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
+				url = "ajax_data_cat_add?id=" + get_menu_param("id") + "&name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
 			else
-				url = "ajax_dataclass_add?name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
+				url = "ajax_data_cat_add?name=" + encodeURIComponent($("#name").val()) + "&sort=" + $("#sort").val() + "&type=" + get_menu_param("type") + "&random=" + Math.random();
 			
 			$.getJSON(
 				url,
@@ -50,7 +50,7 @@ $(function() {
 					else {
 						//重置参数
 						$("#menu_param").val("type:" + get_menu_param("type"));
-						$("#center-column").load("../../admin_templates/dataclass_list.html?random=" + Math.random());
+						$("#center-column").load("../../admin_templates/data_cat_list.html?random=" + Math.random());
 					}
 						
 				}

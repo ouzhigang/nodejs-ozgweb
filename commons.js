@@ -34,7 +34,6 @@ exports.renderTemplate = function(response, templates, res_data) {
 
 	var response_data = {
 		cfg_webname: cfg.WEB_NAME,
-		cfg_jquery: cfg.JQUERY,	
 	};
 	if(res_data != null)
 		response_data.res_data = res_data;

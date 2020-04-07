@@ -20,7 +20,7 @@ function show_data(list) {
 		
 		item_str = '<tr class="bg">';
 		item_str += '<td class="first style1">' + item.name + '</td>';
-		item_str += '<td>' + item.dataclass.name + '</td>';
+		item_str += '<td>' + item.data_cat.name + '</td>';
 		item_str += '<td>' + item.add_time + '</td>';
 		item_str += '<td>' + item.hits + '</td>';
 		item_str += '<td class="last"><a href="#" class="btn_edit" id="btn_edit_' + item.id + '">编辑</a> <a href="#" class="btn_del" id="btn_del_' + item.id + '">删除</a></td>';

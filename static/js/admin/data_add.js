@@ -3,7 +3,7 @@ $(function() {
 			
 	//获取分类数据
 	$.getJSON(
-		"ajax_dataclass_list?type=" + get_menu_param("type") + "&random=" + Math.random(),
+		"ajax_data_cat_list?type=" + get_menu_param("type") + "&random=" + Math.random(),
 		function(data) {
 			show_data(data.data);
 			
@@ -15,7 +15,7 @@ $(function() {
 						$("#title").html("修改数据");
 						
 						$("#name").val(data.data.name);
-						$("#dataclass").val(data.data.dataclass.id);
+						$("#data_cat").val(data.data.data_cat.id);
 						$("#sort").val(data.data.sort);
 												
 						$("#content").val(data.data.content);
@@ -34,13 +34,13 @@ $(function() {
 		
 		var name = $("#name").val();
 		var sort = $("#sort").val();
-		var dataclass = $("#dataclass").val();
+		var data_cat = $("#data_cat").val();
 		var content = $("#content").val();
 		
 		var msg = "";
 		if(name == "")
 			msg += "名称不能为空\n";
-		if(dataclass == "0")
+		if(data_cat == "0")
 			msg += "没有选择分类\n";
 		if(msg != "")
 			alert(msg);
@@ -51,10 +51,10 @@ $(function() {
 			var obj = null;
 			if(get_menu_param("id")) {
 				var id = get_menu_param("id");
-				obj = { id: id, name: name, sort: sort, dataclass_id: dataclass, content: content, type: type, random: Math.random() };
+				obj = { id: id, name: name, sort: sort, data_cat_id: data_cat, content: content, type: type, random: Math.random() };
 			}
 			else
-				obj = { name: name, sort: sort, dataclass_id: dataclass, content: content, type: type, random: Math.random() };
+				obj = { name: name, sort: sort, data_cat_id: data_cat, content: content, type: type, random: Math.random() };
 		
 			$.post(
 				"ajax_data_add",

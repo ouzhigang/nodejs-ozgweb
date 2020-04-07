@@ -20,7 +20,7 @@ exports.Admin = sequelize.define(
 		add_time: Sequelize.INTEGER
 	},
 	{
-		tableName: "simple_admin",
+		tableName: "t_admin",
 		timestamps: false
 	}
 );
@@ -32,20 +32,20 @@ exports.ArtSingle = sequelize.define(
 		content: Sequelize.TEXT
 	},
 	{
-		tableName: "simple_artsingle",
+		tableName: "t_art_single",
 		timestamps: false
 	}
 );
 
-exports.DataClass = sequelize.define(
-	"DataClass",
+exports.DataCat = sequelize.define(
+	"DataCat",
 	{
 		name: Sequelize.STRING,
 		sort: Sequelize.INTEGER,
 		type: Sequelize.INTEGER
 	},
 	{
-		tableName: "simple_dataclass",
+		tableName: "t_data_cat",
 		timestamps: false
 	}
 );
@@ -56,22 +56,22 @@ exports.Data = sequelize.define(
 		name: Sequelize.STRING,
 		content: Sequelize.TEXT,
 		add_time: Sequelize.INTEGER,
-		dataclass_id: Sequelize.INTEGER,
+		data_cat_id: Sequelize.INTEGER,
 		sort: Sequelize.INTEGER,
 		type: Sequelize.INTEGER,
 		hits: Sequelize.INTEGER,
 		picture: Sequelize.STRING
 	},
 	{
-		tableName: "simple_data",
+		tableName: "t_data",
 		timestamps: false
 	}
 );
 
 //关联部分
-this.DataClass.hasMany(this.Data, {
-	foreignKey: "dataclass_id"
+this.DataCat.hasMany(this.Data, {
+	foreignKey: "data_cat_id"
 });
-this.Data.belongsTo(this.DataClass, {
-	foreignKey: "dataclass_id"
+this.Data.belongsTo(this.DataCat, {
+	foreignKey: "data_cat_id"
 });

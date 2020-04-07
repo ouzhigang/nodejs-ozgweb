@@ -13,7 +13,7 @@ function show_data(data) {
 				s += "--";
 		}
 		
-		$("#dataclass").append('<option value="' + data[i].id + '">' + s + data[i].name + '</option>');
+		$("#data_cat").append('<option value="' + data[i].id + '">' + s + data[i].name + '</option>');
 		
 		if(data[i].children) {
 			level += 1;

@@ -293,7 +293,7 @@ exports.ajaxArtSingleUpdate = function(req, res) {
 	}
 };
 
-exports.ajaxDataClassList = function(req, res) {
+exports.ajaxDataCatList = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -303,7 +303,7 @@ exports.ajaxDataClassList = function(req, res) {
 		if(req.query.type)
 			type = parseInt(req.query.type);
 		
-		models.DataClass.findAll({
+		models.DataCat.findAll({
 			where: {
 				type: type
 			},
@@ -318,14 +318,14 @@ exports.ajaxDataClassList = function(req, res) {
 	}
 };
 
-exports.ajaxDataClassGet = function(req, res) {
+exports.ajaxDataCatGet = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		var id = parseInt(req.query.id);
 
-		models.DataClass.findOne({
+		models.DataCat.findOne({
 			where: {
 				id: id
 			}
@@ -336,7 +336,7 @@ exports.ajaxDataClassGet = function(req, res) {
 	}
 };
 
-exports.ajaxDataClassAdd = function(req, res) {
+exports.ajaxDataCatAdd = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -350,7 +350,7 @@ exports.ajaxDataClassAdd = function(req, res) {
 		if(id != 0) {
 			//更新
 			
-			models.DataClass.update(
+			models.DataCat.update(
 				{
 					name: name,
 					sort: parseInt(req.query.sort),
@@ -368,7 +368,7 @@ exports.ajaxDataClassAdd = function(req, res) {
 		}
 		else {
 			//添加
-			models.DataClass.create({
+			models.DataCat.create({
 				name: name,
 				sort: parseInt(req.query.sort),
 				type: parseInt(req.query.type)
@@ -381,7 +381,7 @@ exports.ajaxDataClassAdd = function(req, res) {
 	}
 };
 
-exports.ajaxDataClassDel = function(req, res) {
+exports.ajaxDataCatDel = function(req, res) {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -392,11 +392,11 @@ exports.ajaxDataClassDel = function(req, res) {
 		//删除该分类下的数据
 		models.Data.destroy({
 			where: {
-				dataclass_id: id
+				data_cat_id: id
 			}
 		}).then(function(data) {
 			//删除分类
-			models.DataClass.destroy({
+			models.DataCat.destroy({
 				where: {
 					id: id
 				}
@@ -412,8 +412,8 @@ exports.ajaxDataClassDel = function(req, res) {
 //ajaxDataList用到的递归获取data表的数据
 function data_list(data, total, page, page_size, page_count, res) {
 	
-	data[tmpIndex].getDataClass().then(function(dataclass) {
-		data[tmpIndex].dataValues.dataclass = dataclass;
+	data[tmpIndex].getDataCat().then(function(data_cat) {
+		data[tmpIndex].dataValues.data_cat = data_cat;
 			
 		var dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
 		data[tmpIndex].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
@@ -511,8 +511,8 @@ exports.ajaxDataGet = function(req, res) {
 				return;
 			}
 			
-			data.getDataClass().then(function(dataclass) {
-				data.dataValues.dataclass = dataclass;
+			data.getDataCat().then(function(data_cat) {
+				data.dataValues.data_cat = data_cat;
 					commons.resSuccess(res, "请求成功", data);
 			});
 			
@@ -552,7 +552,7 @@ exports.ajaxDataAdd = function(req, res) {
 				{
 					name: name,
 					content: content,
-					dataclass_id: parseInt(req.body.dataclass_id),
+					data_cat_id: parseInt(req.body.data_cat_id),
 					sort: parseInt(req.body.sort),
 					type: parseInt(req.body.type),
 					picture: ""
@@ -573,7 +573,7 @@ exports.ajaxDataAdd = function(req, res) {
 				name: name,
 				content: content,
 				add_time: parseInt((new Date()).getTime() / 1000),
-				dataclass_id: parseInt(req.body.dataclass_id),
+				data_cat_id: parseInt(req.body.data_cat_id),
 				sort: parseInt(req.body.sort),
 				type: parseInt(req.body.type),
 				hits: 0,
