@@ -37,7 +37,7 @@ const actionAdmin = (req, res) => {
 	}	
 };
 
-const ajaxLogin = (req, res) => {
+const ajaxLogin = async (req, res) => {
 		
 	let name = req.query.name;
 	let pwd = req.query.pwd;
@@ -51,25 +51,25 @@ const ajaxLogin = (req, res) => {
 		return;
 	}
 	
-	models.Admin.findOne({
+	let data = await models.Admin.findOne({
 		where: {
 			name: req.query.name,
 			pwd: req.query.pwd
 		}
-	}).then(data => {
-		if(data) {
-			req.session.sess_admin = {
-				name: data.name,
-				pwd: data.pwd,
-				add_time: data.add_time
-			};
-			commons.resSuccess(res, "登录成功");
-		}
-		else {
-			commons.resFail(res, 1, "用户名或密码错误");
-		}
 	});
 	
+	if(data) {
+		req.session.sess_admin = {
+			name: data.name,
+			pwd: data.pwd,
+			add_time: data.add_time
+		};
+		commons.resSuccess(res, "登录成功");
+	}
+	else {
+		commons.resFail(res, 1, "用户名或密码错误");
+	}
+
 };
 
 const ajaxLogout = (req, res) => {
@@ -84,63 +84,63 @@ const ajaxLogout = (req, res) => {
 
 const ajaxMenuList = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		commons.resSuccess(res, "请求成功", cfg.ADMIN_MENU_LIST);
 	}
 };
 
-const ajaxAdminList = (req, res) => {
+const ajaxAdminList = async (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		//分页索引和每页显示数
 		let page = 1;
-		if(req.query.page)
+		if(req.query.page) {
 			page = parseInt(req.query.page);
-		
+		}
 		let page_size = cfg.PAGE_SIZE;
-		if(req.query.page_size)
+		if(req.query.page_size) {
 			page_size = parseInt(req.query.page_size);
+		}
+		let total = await models.Admin.count();
 		
-		models.Admin.count().then(total => {
-			let page_count = commons.pageCount(total, page_size);
-			let offset = parseInt((page - 1) * page_size);
+		let page_count = commons.pageCount(total, page_size);
+		let offset = parseInt((page - 1) * page_size);
 
-			models.Admin.findAll({
-				offset: offset,
-				limit: page_size,
-				order: [
-					[ "id", "desc" ]
-				]
-			}).then(data => {
-
-				for(let i in data) {						
-					let dt = new Date(parseInt(data[i].add_time) * 1000);						
-					data[i].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
-				}
-				
-				let res_data = {
-					page: page,
-					page_size: page_size,
-					page_count: page_count,
-					total: total,
-					list: data
-				};
-				commons.resSuccess(res, "请求成功", res_data);
-			});
-			
+		let data = await models.Admin.findAll({
+			offset: offset,
+			limit: page_size,
+			order: [
+				[ "id", "desc" ]
+			]
 		});
+
+		for(let i in data) {						
+			let dt = new Date(parseInt(data[i].add_time) * 1000);						
+			data[i].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
+		}
 		
+		let res_data = {
+			page: page,
+			page_size: page_size,
+			page_count: page_count,
+			total: total,
+			list: data
+		};
+		commons.resSuccess(res, "请求成功", res_data);
 	}
 };
 
-const ajaxAdminAdd = (req, res) => {
+const ajaxAdminAdd = async (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		
 		let name = req.query.name;
@@ -160,49 +160,46 @@ const ajaxAdminAdd = (req, res) => {
 			return;
 		}
 		
-		models.Admin.count({
+		let total = await models.Admin.count({
 			where: {
 				name: name
 			}
-		}).then(total => {
-			if(total > 0)
-				commons.resFail(res, 1, "该管理员已存在");
-			else {
-				
-				let admin = {
-					name: name,
-					pwd: pwd,
-					add_time: parseInt((new Date()).getTime() / 1000)
-				};
-				
-				models.Admin.create(admin).then(data => {
-					commons.resSuccess(res, "添加成功", admin);
-				});
-				
-			}
 		});
 		
+		if(total > 0) {
+			commons.resFail(res, 1, "该管理员已存在");
+		}
+		else {
+			
+			let admin = {
+				name: name,
+				pwd: pwd,
+				add_time: parseInt((new Date()).getTime() / 1000),
+			};
+			
+			let data = await models.Admin.create(admin);
+			commons.resSuccess(res, "添加成功", admin);
+		}
 	}
 };
 
-const ajaxAdminDel = (req, res) => {
+const ajaxAdminDel = async (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {		
 		let id = parseInt(req.query.id);
-		models.Admin.destroy({
+		let msg = await models.Admin.destroy({
 			where: {
 				id: id			
 			}
-		}).then(msg => {
-			commons.resSuccess(res, "删除成功");
 		});
-				
+		commons.resSuccess(res, "删除成功");
 	}
 };
 
-const ajaxAdminUpdatePwd = (req, res) => {
+const ajaxAdminUpdatePwd = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -225,36 +222,32 @@ const ajaxAdminUpdatePwd = (req, res) => {
 			return;
 		}
 		
-		models.Admin.count({
+		let total = await models.Admin.count({
 			where: {
 				name: req.session.sess_admin.name,
 				pwd: old_pwd
 			}
-		}).then(total => {
-			if(total == 0) {
-				commons.resFail(res, 1, "旧密码不正确");
-			}
-			else {
-				models.Admin.update(
-					{
-						pwd: pwd
-					},
-					{
-						where: {
-							name: req.session.sess_admin.name
-						}
-					}
-				).then(data => {
-					commons.resSuccess(res, "修改密码成功");	
-				});
-				
-			}
 		});
-		
+		if(total == 0) {
+			commons.resFail(res, 1, "旧密码不正确");
+		}
+		else {
+			let data = await models.Admin.update(
+				{
+					pwd: pwd
+				},
+				{
+					where: {
+						name: req.session.sess_admin.name
+					}
+				}
+			);
+			commons.resSuccess(res, "修改密码成功");
+		}
 	}
 };
 
-const ajaxArtSingleGet = (req, res) => {
+const ajaxArtSingleGet = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -262,18 +255,16 @@ const ajaxArtSingleGet = (req, res) => {
 	else {
 		let id = parseInt(req.query.id);
 		
-		models.ArtSingle.findOne({
+		let data = await models.ArtSingle.findOne({
 			where: {
 				id: id
 			}
-		}).then(data => {
-			commons.resSuccess(res, "请求成功", data);
 		});
-		
+		commons.resSuccess(res, "请求成功", data);
 	}
 };
 
-const ajaxArtSingleUpdate = (req, res) => {
+const ajaxArtSingleUpdate = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -283,7 +274,7 @@ const ajaxArtSingleUpdate = (req, res) => {
 			
 		let id = parseInt(req.body.id);
 		let content = req.body.content;
-		models.ArtSingle.update(
+		let data = await models.ArtSingle.update(
 			{
 				content: content
 			},
@@ -292,14 +283,12 @@ const ajaxArtSingleUpdate = (req, res) => {
 					id: id
 				}
 			}
-		).then(data => {
-			commons.resSuccess(res, "更新成功");
-		});
-		
+		);
+		commons.resSuccess(res, "更新成功");
 	}
 };
 
-const ajaxDataCatList = (req, res) => {
+const ajaxDataCatList = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -311,7 +300,7 @@ const ajaxDataCatList = (req, res) => {
 			type = parseInt(req.query.type);
 		}
 		
-		models.DataCat.findAll({
+		let data = await models.DataCat.findAll({
 			where: {
 				type: type
 			},
@@ -319,47 +308,43 @@ const ajaxDataCatList = (req, res) => {
 				[ "sort", "desc" ],
 				[ "id", "desc" ]
 			]
-		}).then(data => {
-			commons.resSuccess(res, "请求成功", data);
 		});
-		
+		commons.resSuccess(res, "请求成功", data);
 	}
 };
 
-const ajaxDataCatGet = (req, res) => {
+const ajaxDataCatGet = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		let id = parseInt(req.query.id);
 
-		models.DataCat.findOne({
+		let data = await models.DataCat.findOne({
 			where: {
 				id: id
 			}
-		}).then(data => {
-			commons.resSuccess(res, "请求成功", data);
 		});
-		
+		commons.resSuccess(res, "请求成功", data);
 	}
 };
 
-const ajaxDataCatAdd = (req, res) => {
+const ajaxDataCatAdd = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
 	}
 	else {
 		let id = 0;
-		if(req.query.id)
+		if(req.query.id) {
 			id = parseInt(req.query.id);
-		
+		}
 		let name = req.query.name;
 				
 		if(id != 0) {
 			//更新
 			
-			models.DataCat.update(
+			let data = await models.DataCat.update(
 				{
 					name: name,
 					sort: parseInt(req.query.sort),
@@ -370,27 +355,23 @@ const ajaxDataCatAdd = (req, res) => {
 						id: id
 					}
 				}
-			).then(data => {
-				commons.resSuccess(res, "更新成功");
-			});
-			
+			);
+			commons.resSuccess(res, "更新成功");
 		}
 		else {
 			//添加
-			models.DataCat.create({
+			let data = await models.DataCat.create({
 				name: name,
 				sort: parseInt(req.query.sort),
 				type: parseInt(req.query.type)
-			}).then(data => {
-				commons.resSuccess(res, "添加成功");
 			});
-			
+			commons.resSuccess(res, "添加成功");
 		}
 		
 	}
 };
 
-const ajaxDataCatDel = (req, res) => {
+const ajaxDataCatDel = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -400,54 +381,50 @@ const ajaxDataCatDel = (req, res) => {
 		let id = parseInt(req.query.id);		
 		
 		//删除该分类下的数据
-		models.Data.destroy({
+		let data = await models.Data.destroy({
 			where: {
 				data_cat_id: id
 			}
-		}).then(data => {
-			//删除分类
-			models.DataCat.destroy({
-				where: {
-					id: id
-				}
-			}).then(data => {
-				commons.resSuccess(res, "删除成功");	
-			});
-			
 		});
-		
+		//删除分类
+		data = await models.DataCat.destroy({
+			where: {
+				id: id
+			}
+		});
+		commons.resSuccess(res, "删除成功");
 	}
 };
 
 //ajaxDataList用到的递归获取data表的数据
-const data_list = (data, total, page, page_size, page_count, res) => {
+const data_list = async (data, total, page, page_size, page_count, res) => {
 	
-	data[tmpIndex].getDataCat().then(data_cat => {
-		data[tmpIndex].dataValues.data_cat = data_cat;
+	let data_cat = await data[tmpIndex].getDataCat();
+
+	data[tmpIndex].dataValues.data_cat = data_cat;
 			
-		let dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
-		data[tmpIndex].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
-		
-		//最后一条数据
-		if(tmpIndex + 1 >= data.length) {									
-			let res_data = {
-				page: page,
-				page_size: page_size,
-				page_count: page_count,
-				total: total,
-				list: data
-			};
-			commons.resSuccess(res, "请求成功", res_data);
-			return;
-		}
-		
-		tmpIndex++;
-		data_list(data, total, page, page_size, page_count, res);
-	});
+	let dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
+	data[tmpIndex].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
+	
+	//最后一条数据
+	if(tmpIndex + 1 >= data.length) {									
+		let res_data = {
+			page: page,
+			page_size: page_size,
+			page_count: page_count,
+			total: total,
+			list: data
+		};
+		commons.resSuccess(res, "请求成功", res_data);
+		return;
+	}
+	
+	tmpIndex++;
+	data_list(data, total, page, page_size, page_count, res);
 	
 }
 
-const ajaxDataList = (req, res) => {
+const ajaxDataList = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -455,85 +432,79 @@ const ajaxDataList = (req, res) => {
 	else {
 		//分页索引和每页显示数
 		let page = 1;
-		if(req.query.page)
+		if(req.query.page) {
 			page = parseInt(req.query.page);
-		
+		}
+
 		let page_size = cfg.PAGE_SIZE;
-		if(req.query.page_size)
+		if(req.query.page_size) {
 			page_size = parseInt(req.query.page_size);
-				
+		}
 		let type = 1;
-		if(req.query.type)
+		if(req.query.type) {
 			type = parseInt(req.query.type);
-		
-		models.Data.count({
+		}
+
+		let total = await models.Data.count({
 			where: {
 				type: type
 			}
-		}).then(total => {
-			let page_count = commons.pageCount(total, page_size);
-			let offset = parseInt((page - 1) * page_size);
-
-			models.Data.findAll({
-				where: {
-					type: type
-				},
-				offset: offset,
-				limit: page_size,
-				order: [
-					[ "sort", "desc" ],
-					[ "id", "desc" ]
-				]
-			}).then(data => {
-				if(data.length == 0) {
-					let res_data = {
-						page: page,
-						page_size: page_size,
-						page_count: page_count,
-						total: total,
-						list: []
-					};
-					commons.resSuccess(res, "请求成功", res_data);
-					return;
-				}
-				
-				tmpIndex = 0;
-				data_list(data, total, page, page_size, page_count, res);
-			});
-			
 		});
+		let page_count = commons.pageCount(total, page_size);
+		let offset = parseInt((page - 1) * page_size);
+
+		let data = await models.Data.findAll({
+			where: {
+				type: type
+			},
+			offset: offset,
+			limit: page_size,
+			order: [
+				[ "sort", "desc" ],
+				[ "id", "desc" ]
+			]
+		});
+		if(data.length == 0) {
+			let res_data = {
+				page: page,
+				page_size: page_size,
+				page_count: page_count,
+				total: total,
+				list: []
+			};
+			commons.resSuccess(res, "请求成功", res_data);
+			return;
+		}
 		
+		tmpIndex = 0;
+		data_list(data, total, page, page_size, page_count, res);
 	}
 };
 
-const ajaxDataGet = (req, res) => {
+const ajaxDataGet = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
 	}
 	else {
 		let id = parseInt(req.query.id);
-		models.Data.findOne({
+		let data = await models.Data.findOne({
 			where: {
 				id: id
 			}
-		}).then(data => {
-			if(!data) {
-				commons.resFail(res, 1, "找不到数据");
-				return;
-			}
-			
-			data.getDataCat().then(data_cat => {
-				data.dataValues.data_cat = data_cat;
-				commons.resSuccess(res, "请求成功", data);
-			});
-			
 		});
+		if(!data) {
+			commons.resFail(res, 1, "找不到数据");
+			return;
+		}
 		
+		let data_cat = await data.getDataCat();
+		data.dataValues.data_cat = data_cat;
+		commons.resSuccess(res, "请求成功", data);
 	}
 };
 
-const ajaxDataAdd = (req, res) => {
+const ajaxDataAdd = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -562,7 +533,7 @@ const ajaxDataAdd = (req, res) => {
 		if(id != 0) {
 			//更新
 			
-			models.Data.update(
+			let data = await models.Data.update(
 				{
 					name: name,
 					content: content,
@@ -576,14 +547,12 @@ const ajaxDataAdd = (req, res) => {
 						id: id
 					}
 				}
-			).then(data => {
-				commons.resSuccess(res, "更新成功");
-			});
-			
+			);
+			commons.resSuccess(res, "更新成功");
 		}
 		else {
 			//添加
-			models.Data.create({
+			let data = await models.Data.create({
 				name: name,
 				content: content,
 				add_time: parseInt((new Date()).getTime() / 1000),
@@ -592,30 +561,26 @@ const ajaxDataAdd = (req, res) => {
 				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
-			}).then(data => {
-				commons.resSuccess(res, "添加成功");
 			});
-			
+			commons.resSuccess(res, "添加成功");
 		}
 		
 	}
 };
 
-const ajaxDataDel = (req, res) => {
+const ajaxDataDel = async (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
 	}
 	else {
 		let id = parseInt(req.query.id);
-		models.Data.destroy({
+		let data = await models.Data.destroy({
 			where: {
 				id: id
 			}
-		}).then(data => {
-			commons.resSuccess(res, "删除成功");
 		});
-		
+		commons.resSuccess(res, "删除成功");
 	}
 };
 
