@@ -16,8 +16,9 @@ $(function() {
 			$("#menu_param").val("type:" + get_menu_param("type") + ",id:" + $("#data_cat").val());
 			$("#center-column").load("../../admin_templates/data_cat_add.html?random=" + Math.random());
 		}
-		else
+		else {
 			alert("请选择分类");
+		}
 		
 		return false;
 	});

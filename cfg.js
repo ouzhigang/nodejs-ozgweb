@@ -1,9 +1,9 @@
-﻿exports.WEB_NAME = "nodejs-ozgweb";
-exports.DB_PATH = "./db.sys"; //数据库
-exports.SERVER_PORT = 8000; //监听端口
-exports.PAGE_SIZE = 16;
+﻿const WEB_NAME = "nodejs-ozgweb";
+const DB_PATH = "./db.sys"; //数据库
+const SERVER_PORT = 8000; //监听端口
+const PAGE_SIZE = 16;
 
-exports.ADMIN_MENU_LIST = [
+const ADMIN_MENU_LIST = [
 	{
 		id: 1,
 		name: "后台管理",
@@ -59,3 +59,11 @@ exports.ADMIN_MENU_LIST = [
 	},
 
 ];
+
+export default {
+	WEB_NAME,
+	DB_PATH,
+	SERVER_PORT,
+	PAGE_SIZE,
+	ADMIN_MENU_LIST,
+};

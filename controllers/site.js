@@ -1,7 +1,11 @@
 ﻿
-var cfg = require("../cfg")
-var commons = require("../commons")
+//import cfg from "../cfg";
+import commons from "../commons";
 
-exports.actionIndex = function(req, res) {
+const actionIndex = (req, res) => {
 	commons.renderTemplate(res, "site/index.html");
+};
+
+export default {
+	actionIndex,
 };

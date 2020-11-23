@@ -1,88 +1,104 @@
+import cfg from "./cfg";
+import process from "process";
 
-var cfg = require("./cfg");
-var process = require("process");
-
-Date.prototype.format = function(format) {
-	
-	var o = {
-		"M+" : this.getMonth() + 1, //month
-		"d+" : this.getDate(), //day
-		"h+" : this.getHours(), //hour
-		"m+" : this.getMinutes(), //minute
-		"s+" : this.getSeconds(), //second
-		"q+" : Math.floor((this.getMonth() + 3) / 3), //quarter
-		"S" : this.getMilliseconds() //millisecond
+const dateFormat = (dt, fmt) => {
+	let o = {
+		"M+" : dt.getMonth() + 1, //month
+		"d+" : dt.getDate(), //day
+		"h+" : dt.getHours(), //hour
+		"m+" : dt.getMinutes(), //minute
+		"s+" : dt.getSeconds(), //second
+		"q+" : Math.floor((dt.getMonth() + 3) / 3), //quarter
+		"S" : dt.getMilliseconds() //millisecond
 	}
 	
-	if(/(y+)/.test(format)) {
-		format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	if(/(y+)/.test(fmt)) {
+		fmt = fmt.replace(RegExp.$1, (dt.getFullYear() + "").substr(4 - RegExp.$1.length));
 	}
 	
-	for(var k in o) {
-		if(new RegExp("(" + k + ")").test(format)) {
-			format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+	for(let k in o) {
+		if(new RegExp("(" + k + ")").test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
 		}
 	}
-	return format;
-} 
+	return fmt;
+};
 
 //公用的render函数，主要加入一些公用变量
-exports.renderTemplate = function(response, templates, res_data) {
+const renderTemplate = (response, templates, res_data) => {
 
-	if(!res_data)
+	if(!res_data) {
 		res_data = null;
-
-	var response_data = {
+	}
+	
+	let response_data = {
 		cfg_webname: cfg.WEB_NAME,
 	};
-	if(res_data != null)
+	if(res_data != null) {
 		response_data.res_data = res_data;
+	}
 	response.render(templates, response_data);
 };
 
 //仅在这个模块用到
-exports.res = function(res, res_code, desc, data) {
-	var res_data = {
+const res = (respond, res_code, desc, data) => {
+	let res_data = {
 		code: res_code,
 		desc: desc
 	};
-	if(data)
+	if(data) {
 		res_data.data = data;
-	res.json(res_data);
-	res.end();
+	}
+	respond.json(res_data);
+	respond.end();
 };
 
 //回应请求成功
-exports.resSuccess = function(res, desc, data) {
-	if(!data)
+const resSuccess = (respond, desc, data) => {
+	if(!data) {
 		data = null;
+	}
 
-	this.res(res, 0, desc, data);
+	res(respond, 0, desc, data);
 };
 
 //回应请求失败
-exports.resFail = function(res, res_code, desc, data) {
-	if(!data)
+const resFail = (respond, res_code, desc, data) => {
+	if(!data) {
 		data = null;
+	}
 
-	this.res(res, res_code, desc, data);
+	res(respond, res_code, desc, data);
 };
 
 //计算总页数
-exports.pageCount = function(count, page_size) {
-	if(count % page_size == 0)
+const pageCount = (count, page_size) => {
+	if(count % page_size == 0) {
 		return parseInt(count / page_size);
-	else
+	}
+	else {
 		return parseInt((count / page_size) + 1);
+	}
 };
 
 //获取运行环境node,coffee,iojs
-exports.getRunEnv = function() {
+const getRunEnv = () => {
 	
-	var argv = process.argv;
-	if(argv.length > 0)
+	let argv = process.argv;
+	if(argv.length > 0) {
 		return argv[0];
+	}
 	
 	//默认为node
 	return "node";
+};
+
+export default {
+	dateFormat,
+	renderTemplate,
+	res,
+	resSuccess,
+	resFail,
+	pageCount,
+	getRunEnv,
 };

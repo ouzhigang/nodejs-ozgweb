@@ -1,29 +1,32 @@
 ﻿
-var cfg = require("../cfg");
-var commons = require("../commons");
-var models = require("../models");
-var os = require("os");
-var process = require("process");
+import cfg from "../cfg";
+import commons from "../commons";
+import models from "../models";
+import os from "os";
+import process from "process";
 
-var tmpIndex = 0; //临时使用的索引
+let tmpIndex = 0; //临时使用的索引
 
-exports.actionIndex = function(req, res) {
+const actionIndex = (req, res) => {
 	commons.renderTemplate(res, "admin/index.html");
 };
 
-exports.actionAdmin = function(req, res) {
+const actionAdmin = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)
+	if(!req.session.sess_admin) {
 		res.redirect("index");
+	}
 	else {
 		
-		var server = commons.getRunEnv();
-		if(server == "coffee")
+		let server = commons.getRunEnv();
+		if(server == "coffee") {
 			server += ":???";
-		else
+		}
+		else {
 			server += ":" + process.versions.node;
-		
-		var res_data = {
+		}
+
+		let res_data = {
 			sys_type: os.type(),
 			sys_ver: os.release(),
 			server: server,
@@ -34,10 +37,10 @@ exports.actionAdmin = function(req, res) {
 	}	
 };
 
-exports.ajaxLogin = function(req, res) {
+const ajaxLogin = (req, res) => {
 		
-	var name = req.query.name;
-	var pwd = req.query.pwd;
+	let name = req.query.name;
+	let pwd = req.query.pwd;
 	
 	if(!name || name == "") {
 		commons.resFail(res, 1, "用户名不能为空");
@@ -53,7 +56,7 @@ exports.ajaxLogin = function(req, res) {
 			name: req.query.name,
 			pwd: req.query.pwd
 		}
-	}).then(function(data) {
+	}).then(data => {
 		if(data) {
 			req.session.sess_admin = {
 				name: data.name,
@@ -69,7 +72,7 @@ exports.ajaxLogin = function(req, res) {
 	
 };
 
-exports.ajaxLogout = function(req, res) {
+const ajaxLogout = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -79,7 +82,7 @@ exports.ajaxLogout = function(req, res) {
 	}
 };
 
-exports.ajaxMenuList = function(req, res) {
+const ajaxMenuList = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
@@ -88,23 +91,23 @@ exports.ajaxMenuList = function(req, res) {
 	}
 };
 
-exports.ajaxAdminList = function(req, res) {
+const ajaxAdminList = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		//分页索引和每页显示数
-		var page = 1;
+		let page = 1;
 		if(req.query.page)
 			page = parseInt(req.query.page);
 		
-		var page_size = cfg.PAGE_SIZE;
+		let page_size = cfg.PAGE_SIZE;
 		if(req.query.page_size)
 			page_size = parseInt(req.query.page_size);
 		
-		models.Admin.count().then(function(total) {
-			var page_count = commons.pageCount(total, page_size);
-			var offset = parseInt((page - 1) * page_size);
+		models.Admin.count().then(total => {
+			let page_count = commons.pageCount(total, page_size);
+			let offset = parseInt((page - 1) * page_size);
 
 			models.Admin.findAll({
 				offset: offset,
@@ -112,14 +115,14 @@ exports.ajaxAdminList = function(req, res) {
 				order: [
 					[ "id", "desc" ]
 				]
-			}).then(function(data) {
+			}).then(data => {
 
-				for(var i in data) {						
-					var dt = new Date(parseInt(data[i].add_time) * 1000);						
-					data[i].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+				for(let i in data) {						
+					let dt = new Date(parseInt(data[i].add_time) * 1000);						
+					data[i].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
 				}
 				
-				var res_data = {
+				let res_data = {
 					page: page,
 					page_size: page_size,
 					page_count: page_count,
@@ -134,15 +137,15 @@ exports.ajaxAdminList = function(req, res) {
 	}
 };
 
-exports.ajaxAdminAdd = function(req, res) {
+const ajaxAdminAdd = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
 		
-		var name = req.query.name;
-		var pwd = req.query.pwd;
-		var pwd2 = req.query.pwd2;
+		let name = req.query.name;
+		let pwd = req.query.pwd;
+		let pwd2 = req.query.pwd2;
 		
 		if(!name || name == "") {
 			commons.resFail(res, 1, "用户名不能为空");
@@ -161,18 +164,18 @@ exports.ajaxAdminAdd = function(req, res) {
 			where: {
 				name: name
 			}
-		}).then(function(total) {
+		}).then(total => {
 			if(total > 0)
 				commons.resFail(res, 1, "该管理员已存在");
 			else {
 				
-				var admin = {
+				let admin = {
 					name: name,
 					pwd: pwd,
 					add_time: parseInt((new Date()).getTime() / 1000)
 				};
 				
-				models.Admin.create(admin).then(function(data) {
+				models.Admin.create(admin).then(data => {
 					commons.resSuccess(res, "添加成功", admin);
 				});
 				
@@ -182,31 +185,32 @@ exports.ajaxAdminAdd = function(req, res) {
 	}
 };
 
-exports.ajaxAdminDel = function(req, res) {
+const ajaxAdminDel = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {		
-		var id = parseInt(req.query.id);
+		let id = parseInt(req.query.id);
 		models.Admin.destroy({
 			where: {
 				id: id			
 			}
-		}).then(function(msg) {
+		}).then(msg => {
 			commons.resSuccess(res, "删除成功");
 		});
 				
 	}
 };
 
-exports.ajaxAdminUpdatePwd = function(req, res) {
+const ajaxAdminUpdatePwd = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
-		var old_pwd = req.query.old_pwd;
-		var pwd = req.query.pwd;
-		var pwd2 = req.query.pwd2;
+		let old_pwd = req.query.old_pwd;
+		let pwd = req.query.pwd;
+		let pwd2 = req.query.pwd2;
 		
 		if(!req.query.old_pwd || old_pwd == "") {
 			commons.resFail(res, 1, "旧密码不能为空");
@@ -226,7 +230,7 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 				name: req.session.sess_admin.name,
 				pwd: old_pwd
 			}
-		}).then(function(total) {
+		}).then(total => {
 			if(total == 0) {
 				commons.resFail(res, 1, "旧密码不正确");
 			}
@@ -240,7 +244,7 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 							name: req.session.sess_admin.name
 						}
 					}
-				).then(function(data) {
+				).then(data => {
 					commons.resSuccess(res, "修改密码成功");	
 				});
 				
@@ -250,33 +254,35 @@ exports.ajaxAdminUpdatePwd = function(req, res) {
 	}
 };
 
-exports.ajaxArtSingleGet = function(req, res) {
+const ajaxArtSingleGet = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
-		var id = parseInt(req.query.id);
+		let id = parseInt(req.query.id);
 		
 		models.ArtSingle.findOne({
 			where: {
 				id: id
 			}
-		}).then(function(data) {
+		}).then(data => {
 			commons.resSuccess(res, "请求成功", data);
 		});
 		
 	}
 };
 
-exports.ajaxArtSingleUpdate = function(req, res) {
+const ajaxArtSingleUpdate = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		console.log(req.body);
 			
-		var id = parseInt(req.body.id);
-		var content = req.body.content;
+		let id = parseInt(req.body.id);
+		let content = req.body.content;
 		models.ArtSingle.update(
 			{
 				content: content
@@ -286,22 +292,24 @@ exports.ajaxArtSingleUpdate = function(req, res) {
 					id: id
 				}
 			}
-		).then(function(data) {
+		).then(data => {
 			commons.resSuccess(res, "更新成功");
 		});
 		
 	}
 };
 
-exports.ajaxDataCatList = function(req, res) {
+const ajaxDataCatList = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		
-		var type = 1;
-		if(req.query.type)
+		let type = 1;
+		if(req.query.type) {
 			type = parseInt(req.query.type);
+		}
 		
 		models.DataCat.findAll({
 			where: {
@@ -311,41 +319,42 @@ exports.ajaxDataCatList = function(req, res) {
 				[ "sort", "desc" ],
 				[ "id", "desc" ]
 			]
-		}).then(function(data) {
+		}).then(data => {
 			commons.resSuccess(res, "请求成功", data);
 		});
 		
 	}
 };
 
-exports.ajaxDataCatGet = function(req, res) {
+const ajaxDataCatGet = (req, res) => {
 	//需要登录才可以访问
 	if(!req.session.sess_admin)	
 		commons.resFail(res, 1, "需要登录才可以访问");
 	else {
-		var id = parseInt(req.query.id);
+		let id = parseInt(req.query.id);
 
 		models.DataCat.findOne({
 			where: {
 				id: id
 			}
-		}).then(function(data) {
+		}).then(data => {
 			commons.resSuccess(res, "请求成功", data);
 		});
 		
 	}
 };
 
-exports.ajaxDataCatAdd = function(req, res) {
+const ajaxDataCatAdd = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
-		var id = 0;
+		let id = 0;
 		if(req.query.id)
 			id = parseInt(req.query.id);
 		
-		var name = req.query.name;
+		let name = req.query.name;
 				
 		if(id != 0) {
 			//更新
@@ -361,7 +370,7 @@ exports.ajaxDataCatAdd = function(req, res) {
 						id: id
 					}
 				}
-			).then(function(data) {
+			).then(data => {
 				commons.resSuccess(res, "更新成功");
 			});
 			
@@ -372,7 +381,7 @@ exports.ajaxDataCatAdd = function(req, res) {
 				name: name,
 				sort: parseInt(req.query.sort),
 				type: parseInt(req.query.type)
-			}).then(function(data) {
+			}).then(data => {
 				commons.resSuccess(res, "添加成功");
 			});
 			
@@ -381,26 +390,27 @@ exports.ajaxDataCatAdd = function(req, res) {
 	}
 };
 
-exports.ajaxDataCatDel = function(req, res) {
+const ajaxDataCatDel = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		
-		var id = parseInt(req.query.id);		
+		let id = parseInt(req.query.id);		
 		
 		//删除该分类下的数据
 		models.Data.destroy({
 			where: {
 				data_cat_id: id
 			}
-		}).then(function(data) {
+		}).then(data => {
 			//删除分类
 			models.DataCat.destroy({
 				where: {
 					id: id
 				}
-			}).then(function(data) {
+			}).then(data => {
 				commons.resSuccess(res, "删除成功");	
 			});
 			
@@ -410,17 +420,17 @@ exports.ajaxDataCatDel = function(req, res) {
 };
 
 //ajaxDataList用到的递归获取data表的数据
-function data_list(data, total, page, page_size, page_count, res) {
+const data_list = (data, total, page, page_size, page_count, res) => {
 	
-	data[tmpIndex].getDataCat().then(function(data_cat) {
+	data[tmpIndex].getDataCat().then(data_cat => {
 		data[tmpIndex].dataValues.data_cat = data_cat;
 			
-		var dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
-		data[tmpIndex].add_time = dt.format("yyyy-MM-dd hh:mm:ss");
+		let dt = new Date(parseInt(data[tmpIndex].add_time) * 1000);						
+		data[tmpIndex].add_time = commons.dateFormat(dt, "yyyy-MM-dd hh:mm:ss");
 		
 		//最后一条数据
 		if(tmpIndex + 1 >= data.length) {									
-			var res_data = {
+			let res_data = {
 				page: page,
 				page_size: page_size,
 				page_count: page_count,
@@ -437,21 +447,22 @@ function data_list(data, total, page, page_size, page_count, res) {
 	
 }
 
-exports.ajaxDataList = function(req, res) {
+const ajaxDataList = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		//分页索引和每页显示数
-		var page = 1;
+		let page = 1;
 		if(req.query.page)
 			page = parseInt(req.query.page);
 		
-		var page_size = cfg.PAGE_SIZE;
+		let page_size = cfg.PAGE_SIZE;
 		if(req.query.page_size)
 			page_size = parseInt(req.query.page_size);
 				
-		var type = 1;
+		let type = 1;
 		if(req.query.type)
 			type = parseInt(req.query.type);
 		
@@ -459,9 +470,9 @@ exports.ajaxDataList = function(req, res) {
 			where: {
 				type: type
 			}
-		}).then(function(total) {
-			var page_count = commons.pageCount(total, page_size);
-			var offset = parseInt((page - 1) * page_size);
+		}).then(total => {
+			let page_count = commons.pageCount(total, page_size);
+			let offset = parseInt((page - 1) * page_size);
 
 			models.Data.findAll({
 				where: {
@@ -473,9 +484,9 @@ exports.ajaxDataList = function(req, res) {
 					[ "sort", "desc" ],
 					[ "id", "desc" ]
 				]
-			}).then(function(data) {
+			}).then(data => {
 				if(data.length == 0) {
-					var res_data = {
+					let res_data = {
 						page: page,
 						page_size: page_size,
 						page_count: page_count,
@@ -495,25 +506,26 @@ exports.ajaxDataList = function(req, res) {
 	}
 };
 
-exports.ajaxDataGet = function(req, res) {
+const ajaxDataGet = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
-		var id = parseInt(req.query.id);
+		let id = parseInt(req.query.id);
 		models.Data.findOne({
 			where: {
 				id: id
 			}
-		}).then(function(data) {
+		}).then(data => {
 			if(!data) {
 				commons.resFail(res, 1, "找不到数据");
 				return;
 			}
 			
-			data.getDataCat().then(function(data_cat) {
+			data.getDataCat().then(data_cat => {
 				data.dataValues.data_cat = data_cat;
-					commons.resSuccess(res, "请求成功", data);
+				commons.resSuccess(res, "请求成功", data);
 			});
 			
 		});
@@ -521,24 +533,26 @@ exports.ajaxDataGet = function(req, res) {
 	}
 };
 
-exports.ajaxDataAdd = function(req, res) {
+const ajaxDataAdd = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
 		
-		var id = 0;
-		if(req.body.id)
+		let id = 0;
+		if(req.body.id) {
 			id = parseInt(req.body.id);
-		
-		var name = null;
+		}
+
+		let name = null;
 		if(!req.body.name) {
 			commons.resFail(res, 1, "名称不能为空");
 			return;
 		}			
 		name = req.body.name;
 		
-		var content = null;
+		let content = null;
 		if(!req.body.content) {
 			commons.resFail(res, 1, "内容不能为空");
 			return;
@@ -562,7 +576,7 @@ exports.ajaxDataAdd = function(req, res) {
 						id: id
 					}
 				}
-			).then(function(data) {
+			).then(data => {
 				commons.resSuccess(res, "更新成功");
 			});
 			
@@ -578,7 +592,7 @@ exports.ajaxDataAdd = function(req, res) {
 				type: parseInt(req.body.type),
 				hits: 0,
 				picture: ""
-			}).then(function(data) {
+			}).then(data => {
 				commons.resSuccess(res, "添加成功");
 			});
 			
@@ -587,19 +601,42 @@ exports.ajaxDataAdd = function(req, res) {
 	}
 };
 
-exports.ajaxDataDel = function(req, res) {
+const ajaxDataDel = (req, res) => {
 	//需要登录才可以访问
-	if(!req.session.sess_admin)	
+	if(!req.session.sess_admin)	{
 		commons.resFail(res, 1, "需要登录才可以访问");
+	}
 	else {
-		var id = parseInt(req.query.id);
+		let id = parseInt(req.query.id);
 		models.Data.destroy({
 			where: {
 				id: id
 			}
-		}).then(function(data) {
+		}).then(data => {
 			commons.resSuccess(res, "删除成功");
 		});
 		
 	}
+};
+
+export default {
+	actionIndex,
+	actionAdmin,
+	ajaxLogin,
+	ajaxLogout,
+	ajaxMenuList,	
+	ajaxAdminList,
+	ajaxAdminAdd,
+	ajaxAdminDel,
+	ajaxAdminUpdatePwd,
+	ajaxArtSingleGet,
+	ajaxArtSingleUpdate,
+	ajaxDataCatList,
+	ajaxDataCatGet,
+	ajaxDataCatAdd,
+	ajaxDataCatDel,
+	ajaxDataList,
+	ajaxDataGet,
+	ajaxDataAdd,
+	ajaxDataDel,
 };

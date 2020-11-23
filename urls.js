@@ -1,11 +1,8 @@
 
-var admin = require("./controllers/admin");
-var site = require("./controllers/site");
+import admin from "./controllers/admin";
+//import site from "./controllers/site";
 
-var app = null;
-
-exports.startUrls = function(app) {
-	this.app = app;
+const startUrls = (app) => {
 	app.get("/admin/index", admin.actionIndex);
 	app.get("/admin/admin", admin.actionAdmin);
 	app.get("/admin/ajax_login", admin.ajaxLogin);
@@ -26,4 +23,8 @@ exports.startUrls = function(app) {
 	app.post("/admin/ajax_data_add", admin.ajaxDataAdd);
 	app.get("/admin/ajax_data_del", admin.ajaxDataDel);
 	
+};
+
+export default {
+	startUrls,
 };

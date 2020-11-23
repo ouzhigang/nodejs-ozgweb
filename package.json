@@ -4,7 +4,7 @@
   "description": "nodejs-ozgweb",
   "main": "main.js",
   "scripts": {
-    "test": "node main.js"
+    "test": "babel-node main.js"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,13 @@
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "cookie-session": "^1.4.0",
-    "ejs": "^3.0.2",
+    "ejs": "^3.1.5",
     "express": "^4.17.1",
     "process": "^0.11.10",
-    "sequelize": "^5.21.5",
-    "sqlite3": "^4.1.1"
+    "sequelize": "^6.3.5",
+    "sqlite3": "^5.0.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.26.0"
   }
 }

@@ -1,14 +1,14 @@
-﻿
-var http = require("http");
-var express = require("express");
-var session = require("cookie-session");
-var cookieParser = require("cookie-parser");
-var bodyParser = require("body-parser");
-var cfg = require("./cfg");
-var urls = require("./urls");
+﻿import http from "http";
+import express from "express";
+import session from "cookie-session";
+import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
+import ejs from "ejs";
+import cfg from "./cfg";
+import urls from "./urls";
 
-var app = express();
-app.engine("html", (require("ejs")).renderFile);
+let app = express();
+app.engine("html", ejs.renderFile);
 
 app.set("view engine", "ejs");
 app.set("views", __dirname + "/views");
@@ -25,14 +25,12 @@ app.use(session({
 //url路由
 urls.startUrls(app);
 
-app.on("close",
-	function(err) {
+app.on("close", err => {
 		console.log("app close");
 	}
 );
 
-(http.createServer(app)).listen(cfg.SERVER_PORT,
-	function() {
+http.createServer(app).listen(cfg.SERVER_PORT, () => {
 		console.log("正在运行中...");
 	}
 );

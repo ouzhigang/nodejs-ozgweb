@@ -1,6 +1,6 @@
-﻿var Sequelize = require("sequelize");
+﻿import Sequelize from "sequelize";
 
-var sequelize = new Sequelize(
+let sequelize = new Sequelize(
 	"ozgweb", 
 	null, 
 	null, 
@@ -12,7 +12,7 @@ var sequelize = new Sequelize(
 
 //定义部分
 
-exports.Admin = sequelize.define(
+const Admin = sequelize.define(
 	"Admin",
 	{
 		name: Sequelize.STRING,
@@ -25,7 +25,7 @@ exports.Admin = sequelize.define(
 	}
 );
 
-exports.ArtSingle = sequelize.define(
+const ArtSingle = sequelize.define(
 	"ArtSingle",
 	{
 		name: Sequelize.STRING,
@@ -37,7 +37,7 @@ exports.ArtSingle = sequelize.define(
 	}
 );
 
-exports.DataCat = sequelize.define(
+const DataCat = sequelize.define(
 	"DataCat",
 	{
 		name: Sequelize.STRING,
@@ -50,7 +50,7 @@ exports.DataCat = sequelize.define(
 	}
 );
 
-exports.Data = sequelize.define(
+const Data = sequelize.define(
 	"Data",
 	{
 		name: Sequelize.STRING,
@@ -69,9 +69,16 @@ exports.Data = sequelize.define(
 );
 
 //关联部分
-this.DataCat.hasMany(this.Data, {
+DataCat.hasMany(Data, {
 	foreignKey: "data_cat_id"
 });
-this.Data.belongsTo(this.DataCat, {
+Data.belongsTo(DataCat, {
 	foreignKey: "data_cat_id"
 });
+
+export default {
+	Admin,
+	ArtSingle,
+	DataCat,
+	Data,
+};
